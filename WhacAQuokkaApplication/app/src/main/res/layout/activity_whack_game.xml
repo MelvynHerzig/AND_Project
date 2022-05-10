@@ -7,17 +7,17 @@
     android:background="@color/green"
     tools:context=".WhackGameActivity">
 
-    <!-- Holes -->
-    <!-- First line of holes -->
+    <!-- Holes and Quokkas -->
+    <!-- First line of holes and quokkas -->
     <ImageView
         android:id="@+id/hole_1"
         android:layout_width="100dp"
-        android:layout_height="50dp"
+        android:layout_height="100dp"
         android:layout_marginEnd="100dp"
         android:contentDescription="@string/hole_image"
         android:scaleType="fitXY"
-        android:src="@drawable/hole"
-        app:layout_constraintBottom_toBottomOf="@id/hole_4"
+        android:src="@drawable/hole_with_quokka"
+        app:layout_constraintBottom_toTopOf="@id/hole_4"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="@id/hole_2"
         app:layout_constraintTop_toTopOf="parent" />
@@ -25,11 +25,11 @@
     <ImageView
         android:id="@+id/hole_2"
         android:layout_width="100dp"
-        android:layout_height="50dp"
+        android:layout_height="100dp"
         android:contentDescription="@string/hole_image"
         android:scaleType="fitXY"
         android:src="@drawable/hole"
-        app:layout_constraintBottom_toBottomOf="@id/hole_5"
+        app:layout_constraintBottom_toTopOf="@id/hole_5"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -37,12 +37,12 @@
     <ImageView
         android:id="@+id/hole_3"
         android:layout_width="100dp"
-        android:layout_height="50dp"
+        android:layout_height="100dp"
         android:layout_marginStart="100dp"
         android:contentDescription="@string/hole_image"
         android:scaleType="fitXY"
         android:src="@drawable/hole"
-        app:layout_constraintBottom_toBottomOf="@id/hole_6"
+        app:layout_constraintBottom_toTopOf="@id/hole_6"
         app:layout_constraintLeft_toLeftOf="@id/hole_2"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -51,7 +51,7 @@
     <ImageView
         android:id="@+id/hole_4"
         android:layout_width="100dp"
-        android:layout_height="50dp"
+        android:layout_height="100dp"
         android:layout_marginEnd="100dp"
         android:contentDescription="@string/hole_image"
         android:scaleType="fitXY"
@@ -64,7 +64,7 @@
     <ImageView
         android:id="@+id/hole_5"
         android:layout_width="100dp"
-        android:layout_height="50dp"
+        android:layout_height="100dp"
         android:contentDescription="@string/hole_image"
         android:scaleType="fitXY"
         android:src="@drawable/hole"
@@ -76,7 +76,7 @@
     <ImageView
         android:id="@+id/hole_6"
         android:layout_width="100dp"
-        android:layout_height="50dp"
+        android:layout_height="100dp"
         android:layout_marginStart="100dp"
         android:contentDescription="@string/hole_image"
         android:scaleType="fitXY"
@@ -90,7 +90,7 @@
     <ImageView
         android:id="@+id/hole_7"
         android:layout_width="100dp"
-        android:layout_height="50dp"
+        android:layout_height="100dp"
         android:layout_marginEnd="100dp"
         android:contentDescription="@string/hole_image"
         android:scaleType="fitXY"
@@ -103,7 +103,7 @@
     <ImageView
         android:id="@+id/hole_8"
         android:layout_width="100dp"
-        android:layout_height="50dp"
+        android:layout_height="100dp"
         android:contentDescription="@string/hole_image"
         android:scaleType="fitXY"
         android:src="@drawable/hole"
@@ -115,139 +115,11 @@
     <ImageView
         android:id="@+id/hole_9"
         android:layout_width="100dp"
-        android:layout_height="50dp"
+        android:layout_height="100dp"
         android:layout_marginStart="100dp"
         android:contentDescription="@string/hole_image"
         android:scaleType="fitXY"
         android:src="@drawable/hole"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="@id/hole_8"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/hole_6" />
-
-    <!-- Quokka -->
-    <!-- First line of quokka -->
-    <ImageView
-        android:id="@+id/quokka_1"
-        android:layout_width="100dp"
-        android:layout_height="50dp"
-        android:layout_marginEnd="100dp"
-        android:contentDescription="@string/quokka_image"
-        android:scaleType="fitXY"
-        android:src="@drawable/quokka"
-        android:visibility="visible"
-        app:layout_constraintBottom_toBottomOf="@id/hole_4"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="@id/hole_2"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <ImageView
-        android:id="@+id/quokka_2"
-        android:layout_width="100dp"
-        android:layout_height="50dp"
-        android:contentDescription="@string/quokka_image"
-        android:scaleType="fitXY"
-        android:src="@drawable/quokka"
-        android:visibility="visible"
-        app:layout_constraintBottom_toBottomOf="@id/hole_5"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <ImageView
-        android:id="@+id/quokka_3"
-        android:layout_width="100dp"
-        android:layout_height="50dp"
-        android:layout_marginStart="100dp"
-        android:contentDescription="@string/quokka_image"
-        android:scaleType="fitXY"
-        android:src="@drawable/quokka"
-        android:visibility="visible"
-        app:layout_constraintBottom_toBottomOf="@id/hole_6"
-        app:layout_constraintLeft_toLeftOf="@id/hole_2"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <!-- Second line of quokka -->
-    <ImageView
-        android:id="@+id/quokka_4"
-        android:layout_width="100dp"
-        android:layout_height="50dp"
-        android:layout_marginEnd="100dp"
-        android:contentDescription="@string/quokka_image"
-        android:scaleType="fitXY"
-        android:src="@drawable/quokka"
-        android:visibility="visible"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="@id/hole_5"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <ImageView
-        android:id="@+id/quokka_5"
-        android:layout_width="100dp"
-        android:layout_height="50dp"
-        android:contentDescription="@string/quokka_image"
-        android:scaleType="fitXY"
-        android:src="@drawable/quokka"
-        android:visibility="visible"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <ImageView
-        android:id="@+id/quokka_6"
-        android:layout_width="100dp"
-        android:layout_height="50dp"
-        android:layout_marginStart="100dp"
-        android:contentDescription="@string/quokka_image"
-        android:scaleType="fitXY"
-        android:src="@drawable/quokka"
-        android:visibility="visible"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="@id/hole_5"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <!-- Last line of quokka -->
-    <ImageView
-        android:id="@+id/quokka_7"
-        android:layout_width="100dp"
-        android:layout_height="50dp"
-        android:layout_marginEnd="100dp"
-        android:contentDescription="@string/quokka_image"
-        android:scaleType="fitXY"
-        android:src="@drawable/quokka"
-        android:visibility="visible"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="@id/hole_8"
-        app:layout_constraintTop_toBottomOf="@id/hole_4" />
-
-    <ImageView
-        android:id="@+id/quokka_8"
-        android:layout_width="100dp"
-        android:layout_height="50dp"
-        android:contentDescription="@string/quokka_image"
-        android:scaleType="fitXY"
-        android:src="@drawable/quokka"
-        android:visibility="visible"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/hole_5" />
-
-    <ImageView
-        android:id="@+id/quokka_9"
-        android:layout_width="70dp"
-        android:layout_height="70dp"
-        android:layout_marginStart="100dp"
-        android:layout_marginBottom="50dp"
-        android:contentDescription="@string/quokka_image"
-        android:scaleType="fitXY"
-        android:src="@drawable/quokka"
-        android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="@id/hole_8"
         app:layout_constraintRight_toRightOf="parent"
