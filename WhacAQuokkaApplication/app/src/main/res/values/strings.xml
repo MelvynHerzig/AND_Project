@@ -5,4 +5,6 @@
     <string name="start_button">Start</string>
     <string name="quit_button">Quit</string>
     <string name="hole_image">Hole and Quokka</string>
+    <string name="score_image">Score</string>
+    <string name="time_image">Time</string>
 </resources>
