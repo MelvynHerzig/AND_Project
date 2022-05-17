@@ -2,8 +2,10 @@ package com.and.whacaquokkaapplication
 
 import android.os.Bundle
 import android.provider.Settings
+import android.util.Log
 import android.widget.Button
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.gms.nearby.Nearby
 import com.google.android.gms.nearby.connection.*
@@ -33,12 +35,15 @@ class MainActivity : AppCompatActivity() {
         val advertisingOptions = AdvertisingOptions.Builder().setStrategy(STRATEGY).build()
         Nearby.getConnectionsClient(this)
             .startAdvertising(
-                Settings.System.getString(contentResolver, Settings.Global.DEVICE_NAME), SERVICE_ID, connectionLifecycleCallback, advertisingOptions
+                Settings.System.getString(contentResolver, Settings.Global.DEVICE_NAME),
+                SERVICE_ID,
+                connectionLifecycleCallback,
+                advertisingOptions
             )
             .addOnSuccessListener(
                 OnSuccessListener {
                     Toast.makeText(this, "start advert success listener", Toast.LENGTH_SHORT).show()
-                    })
+                })
             .addOnFailureListener(
                 OnFailureListener {
                     Toast.makeText(this, it.message, Toast.LENGTH_SHORT).show()
@@ -63,14 +68,27 @@ class MainActivity : AppCompatActivity() {
             override fun onEndpointFound(endpointId: String, info: DiscoveredEndpointInfo) {
                 // An endpoint was found. We request a connection to it.
                 Nearby.getConnectionsClient(this@MainActivity)
-                    .requestConnection(Settings.System.getString(contentResolver, Settings.Global.DEVICE_NAME), endpointId, connectionLifecycleCallback)
+                    .requestConnection(
+                        Settings.System.getString(
+                            contentResolver,
+                            Settings.Global.DEVICE_NAME
+                        ), endpointId, connectionLifecycleCallback
+                    )
                     .addOnSuccessListener(
                         OnSuccessListener {
-                            Toast.makeText(this@MainActivity, "discover callback success listener", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(
+                                this@MainActivity,
+                                "discover callback success listener",
+                                Toast.LENGTH_SHORT
+                            ).show()
                         })
                     .addOnFailureListener(
                         OnFailureListener {
-                            Toast.makeText(this@MainActivity, "discover callback failure listener", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(
+                                this@MainActivity,
+                                "discover callback failure listener",
+                                Toast.LENGTH_SHORT
+                            ).show()
                         })
             }
 
@@ -82,15 +100,51 @@ class MainActivity : AppCompatActivity() {
     private val connectionLifecycleCallback: ConnectionLifecycleCallback =
         object : ConnectionLifecycleCallback() {
             override fun onConnectionInitiated(endpointId: String, connectionInfo: ConnectionInfo) {
+
+                val dialog = AlertDialog.Builder(this@MainActivity)
+                    .setTitle("Connexion à un partenaire de jeu")
+                    .setMessage("Voulez-vous vous connecter à " + connectionInfo.endpointName)
+                    .setCancelable(false) // dialog cannot be closed without doing a choice
+                    .setNegativeButton(android.R.string.cancel) { _, _ ->
+                        Nearby.getConnectionsClient(this@MainActivity)
+                            .rejectConnection(endpointId)
+// cancel action
+                    }
+                    .setPositiveButton(android.R.string.yes) { _, _ ->
+                        Nearby.getConnectionsClient(this@MainActivity)
+                            .acceptConnection(endpointId, ReceiveBytesPayloadListener())
+                    }
+                    .create()
+                dialog.show()
                 // Automatically accept the connection on both sides.
-                Nearby.getConnectionsClient(this@MainActivity).acceptConnection(endpointId, ReceiveBytesPayloadListener())
             }
 
             override fun onConnectionResult(endpointId: String, result: ConnectionResolution) {
+                Log.println(Log.DEBUG, "connectionResult", result.status.statusMessage!!)
                 when (result.status.statusCode) {
-                    ConnectionsStatusCodes.STATUS_OK -> {Toast.makeText(this@MainActivity, "on connection result OK", Toast.LENGTH_SHORT).show()}
-                    ConnectionsStatusCodes.STATUS_CONNECTION_REJECTED -> {Toast.makeText(this@MainActivity, "on connection result REJECTED", Toast.LENGTH_SHORT).show()}
-                    ConnectionsStatusCodes.STATUS_ERROR -> {Toast.makeText(this@MainActivity, "on connection result ERROR", Toast.LENGTH_SHORT).show()}
+                    ConnectionsStatusCodes.STATUS_OK -> {
+                        Toast.makeText(
+                            this@MainActivity,
+                            "on connection result OK",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        Nearby.getConnectionsClient(this@MainActivity)
+                            .sendPayload(endpointId, Payload.fromBytes("helloWorld".toByteArray()))
+                    }
+                    ConnectionsStatusCodes.STATUS_CONNECTION_REJECTED -> {
+                        Toast.makeText(
+                            this@MainActivity,
+                            result.status.statusMessage,
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                    ConnectionsStatusCodes.STATUS_ERROR -> {
+                        Toast.makeText(
+                            this@MainActivity,
+                            result.status.statusMessage,
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
                     else -> {}
                 }
             }
@@ -106,6 +160,7 @@ class MainActivity : AppCompatActivity() {
             // This always gets the full data of the payload. Is null if it's not a BYTES payload.
             if (payload.type == Payload.Type.BYTES) {
                 val receivedBytes = payload.asBytes()
+                Log.println(Log.DEBUG, "Payload", String(receivedBytes!!))
             }
         }
 
