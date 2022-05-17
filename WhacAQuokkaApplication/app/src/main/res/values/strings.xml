@@ -6,4 +6,8 @@
     <string name="quit_button">Quit</string>
     <string name="hole_image">Hole</string>
     <string name="quokka_image">Quokka</string>
+    <string name="dialogYes">I accept</string>
+    <string name="dialogNo">Im out</string>
+    <string name="dialogTitle">Permission required!</string>
+    <string name="dialogMessage">This permission is mandatory:\n %1$s</string>
 </resources>
