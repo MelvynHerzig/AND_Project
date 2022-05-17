@@ -1,16 +1,11 @@
 package com.and.whacaquokkaapplication
 
-import android.Manifest
-import android.app.AlertDialog
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.provider.Settings
-import android.util.Log
 import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import com.google.android.gms.nearby.Nearby
 import com.google.android.gms.nearby.connection.*
 import com.google.android.gms.tasks.OnFailureListener
@@ -22,11 +17,6 @@ class MainActivity : AppCompatActivity() {
     val STRATEGY: Strategy = Strategy.P2P_POINT_TO_POINT
     val SERVICE_ID = "120002"
 
-    val BLUETOOTH_ADVERTISE_PERMISSION_CODE = 1 // Discovery
-    val BLUETOOTH_SCAN_PERMISSION_CODE = 2
-    val ACCESS_COARSE_LOCATION_PERMISSION_CODE = 3
-
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,61 +24,25 @@ class MainActivity : AppCompatActivity() {
 
 
         findViewById<Button>(R.id.btnDiscover).setOnClickListener {
-            startDiscovery()
+            if (!Permission.hasPermissions(this)) {
+                Permission.requestPermissionsDiscovery(this)
+            } else {
+                startDiscovery()
+            }
         }
 
         findViewById<Button>(R.id.btnAdvert).setOnClickListener {
-            startAdvertising()
-            checkPermission(Manifest.permission.BLUETOOTH_ADVERTISE, BLUETOOTH_ADVERTISE_PERMISSION_CODE)
+            if (!Permission.hasPermissions(this)) {
+                Permission.requestPermissionsAdvertising(this)
+            } else {
+                startAdvertising()
+            }
         }
     }
 
     /*******************************************************************************************
      *                                    Permissions                                          *
      *******************************************************************************************/
-
-    /**
-     * Displays a dialog that ask user to accept the permissions or close the application.
-     */
-    private fun pleaseAcceptPermissionsDialog(permission: String) {
-
-        val betterPermissionName = permission.split(".").last().replace("_", " ").lowercase()
-
-        val dialog = AlertDialog.Builder(this)
-            .setTitle(R.string.dialogTitle)
-            .setMessage(getString(R.string.dialogMessage, betterPermissionName))
-            .setCancelable(false)
-            .setNegativeButton(R.string.dialogNo) { _,_ ->
-                finish()
-            }
-            .setPositiveButton(R.string.dialogYes) { _,_ ->
-                checkPermissions()
-            }
-            .create()
-        dialog.show()
-    }
-
-    /**
-     * Call checkPermission for each required permission.
-     */
-    private fun checkPermissions() {
-        checkPermission(Manifest.permission.BLUETOOTH_SCAN, BLUETOOTH_SCAN_PERMISSION_CODE)
-        //checkPermission(Manifest.permission.ACCESS_COARSE_LOCATION, ACCESS_COARSE_LOCATION_PERMISSION_CODE)
-    }
-
-    /**
-     * Check for a permission and request it if necessary.
-     * Source: https://www.geeksforgeeks.org/android-how-to-request-permissions-in-android-application/
-     */
-    private fun checkPermission(permission: String, requestCode: Int) {
-        if (ContextCompat.checkSelfPermission(
-                this@MainActivity, permission) == PackageManager.PERMISSION_DENIED) {
-
-            // Requesting the permission
-            ActivityCompat.requestPermissions(this@MainActivity,
-                arrayOf(permission), requestCode)
-        }
-    }
 
     /**
      * Function called when the user decline a required permission. Displays a the
@@ -100,16 +54,24 @@ class MainActivity : AppCompatActivity() {
                                             grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
 
-        if(requestCode == BLUETOOTH_ADVERTISE_PERMISSION_CODE ||
-           requestCode == BLUETOOTH_SCAN_PERMISSION_CODE      ||
-           requestCode == ACCESS_COARSE_LOCATION_PERMISSION_CODE
-            ) {
-            if (grantResults.isNotEmpty() && grantResults[0] != PackageManager.PERMISSION_GRANTED) {
-                pleaseAcceptPermissionsDialog(permissions[0])
+        // On all success start advertising
+        if(requestCode == Permission.ADVERTISING_CODE) {
+            if (grantResults.isNotEmpty() && grantResults.all{ it == PackageManager.PERMISSION_GRANTED}) {
+                startAdvertising()
+            }
+        }
+
+        // On all success start discovery
+        if(requestCode == Permission.DISCOVERY_CODE) {
+            if (grantResults.isNotEmpty() && grantResults.all{ it == PackageManager.PERMISSION_GRANTED}) {
+                startDiscovery()
             }
         }
     }
 
+    /*******************************************************************************************
+     *                                     Bluetooth                                           *
+     *******************************************************************************************/
 
     private fun startAdvertising() {
         val advertisingOptions = AdvertisingOptions.Builder().setStrategy(STRATEGY).build()
