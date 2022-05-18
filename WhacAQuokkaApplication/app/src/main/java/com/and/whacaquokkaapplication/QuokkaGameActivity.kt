@@ -2,7 +2,6 @@ package com.and.whacaquokkaapplication
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 
@@ -11,7 +10,7 @@ class QuokkaGameActivity : AppCompatActivity() {
     private lateinit var scoreTextView : TextView
     private lateinit var timeTextView : TextView
 
-    private lateinit var quitButton: Button
+    private lateinit var quitButton: TextView
 
     private lateinit var quokka1 : ImageView
     private lateinit var quokka2 : ImageView

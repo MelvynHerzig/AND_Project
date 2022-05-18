@@ -2,12 +2,13 @@ package com.and.whacaquokkaapplication
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.widget.Button
+import android.widget.TextView
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var discoverButton : Button
-    private lateinit var advertButton : Button
+    // TODO: nine patch doesn't work with buttons
+    private lateinit var discoverButton : TextView
+    private lateinit var advertButton : TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
