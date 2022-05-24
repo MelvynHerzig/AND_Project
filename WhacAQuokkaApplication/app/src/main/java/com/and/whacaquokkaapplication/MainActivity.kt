@@ -11,22 +11,29 @@ import com.google.android.gms.nearby.Nearby
 import com.google.android.gms.nearby.connection.*
 import com.google.android.gms.tasks.OnFailureListener
 import com.google.android.gms.tasks.OnSuccessListener
-
+import android.widget.TextView
 
 class MainActivity : AppCompatActivity() {
 
     val STRATEGY: Strategy = Strategy.P2P_POINT_TO_POINT
     val SERVICE_ID = "120001"
 
+    // Nine patch doesn't work with buttons so we used TextView instead
+    private lateinit var discoverButton : TextView
+    private lateinit var advertButton : TextView
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        findViewById<Button>(R.id.btnAdvert).setOnClickListener {
+        discoverButton = findViewById(R.id.discover_button)
+        advertButton = findViewById(R.id.advert_button)
+
+        advertButton.setOnClickListener {
             startAdvertising()
         }
-
-        findViewById<Button>(R.id.btnDiscover).setOnClickListener {
+                
+        discoverButton.setOnClickListener {
             startDiscovery()
         }
     }
@@ -108,7 +115,7 @@ class MainActivity : AppCompatActivity() {
                     .setNegativeButton(android.R.string.cancel) { _, _ ->
                         Nearby.getConnectionsClient(this@MainActivity)
                             .rejectConnection(endpointId)
-// cancel action
+                    // cancel action
                     }
                     .setPositiveButton(android.R.string.yes) { _, _ ->
                         Nearby.getConnectionsClient(this@MainActivity)
