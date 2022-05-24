@@ -6,7 +6,7 @@ import android.widget.TextView
 
 class MainActivity : AppCompatActivity() {
 
-    // TODO: nine patch doesn't work with buttons
+    // Nine patch doesn't work with buttons so we used TextView instead
     private lateinit var discoverButton : TextView
     private lateinit var advertButton : TextView
 
