@@ -2,8 +2,11 @@
     <string name="app_name">Whac A Quokka Application</string>
     <string name="title_image">Title</string>
     <string name="background_image">Background</string>
-    <string name="start_button">Start</string>
+    <string name="discover_button">Discover</string>
+    <string name="advert_button">Advert</string>
     <string name="quit_button">Quit</string>
-    <string name="hole_image">Hole</string>
+    <string name="hole_image">Hole and Quokka</string>
     <string name="quokka_image">Quokka</string>
+    <string name="score_image">Score</string>
+    <string name="time_image">Time</string>
 </resources>
