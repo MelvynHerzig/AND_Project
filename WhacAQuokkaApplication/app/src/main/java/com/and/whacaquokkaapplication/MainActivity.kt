@@ -19,16 +19,11 @@ class MainActivity : AppCompatActivity() {
     val STRATEGY: Strategy = Strategy.P2P_POINT_TO_POINT
     val SERVICE_ID = "120002"
 
-
-    // Nine patch doesn't work with buttons so we used TextView instead
-    private lateinit var discoverButton : TextView
-    private lateinit var advertButton : TextView
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        findViewById<Button>(R.id.btnDiscover).setOnClickListener {
+        findViewById<TextView>(R.id.advert_button).setOnClickListener {
             if (!Permission.hasPermissions(this)) {
                 Permission.requestPermissionsDiscovery(this)
             } else {
@@ -36,7 +31,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        findViewById<Button>(R.id.btnAdvert).setOnClickListener {
+        findViewById<TextView>(R.id.discover_button).setOnClickListener {
             if (!Permission.hasPermissions(this)) {
                 Permission.requestPermissionsAdvertising(this)
             } else {
