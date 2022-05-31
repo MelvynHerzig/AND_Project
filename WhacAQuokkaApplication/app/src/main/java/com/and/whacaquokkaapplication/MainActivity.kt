@@ -1,5 +1,6 @@
 package com.and.whacaquokkaapplication
 
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.provider.Settings
 import android.util.Log
@@ -15,27 +16,61 @@ import android.widget.TextView
 class MainActivity : AppCompatActivity() {
 
     val STRATEGY: Strategy = Strategy.P2P_POINT_TO_POINT
-    val SERVICE_ID = "120001"
-
-    // Nine patch doesn't work with buttons so we used TextView instead
-    private lateinit var discoverButton : TextView
-    private lateinit var advertButton : TextView
+    val SERVICE_ID = "120002"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        discoverButton = findViewById(R.id.discover_button)
-        advertButton = findViewById(R.id.advert_button)
-
-        advertButton.setOnClickListener {
-            startAdvertising()
+        findViewById<TextView>(R.id.advert_button).setOnClickListener {
+            if (!Permission.hasPermissions(this)) {
+                Permission.requestPermissionsDiscovery(this)
+            } else {
+                startDiscovery()
+            }
         }
-                
-        discoverButton.setOnClickListener {
-            startDiscovery()
+
+        findViewById<TextView>(R.id.discover_button).setOnClickListener {
+            if (!Permission.hasPermissions(this)) {
+                Permission.requestPermissionsAdvertising(this)
+            } else {
+                startAdvertising()
+            }
         }
     }
+
+    /*******************************************************************************************
+     *                                    Permissions                                          *
+     *******************************************************************************************/
+
+    /**
+     * Function called when the user decline a required permission. Displays a the
+     * "please accept our permission" dialog.
+     * Source: https://www.geeksforgeeks.org/android-how-to-request-permissions-in-android-application/
+     */
+    override fun onRequestPermissionsResult(requestCode: Int,
+                                            permissions: Array<String>,
+                                            grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
+        // On all success start advertising
+        if(requestCode == Permission.ADVERTISING_CODE) {
+            if (grantResults.isNotEmpty() && grantResults.all{ it == PackageManager.PERMISSION_GRANTED}) {
+                startAdvertising()
+            }
+        }
+
+        // On all success start discovery
+        if(requestCode == Permission.DISCOVERY_CODE) {
+            if (grantResults.isNotEmpty() && grantResults.all{ it == PackageManager.PERMISSION_GRANTED}) {
+                startDiscovery()
+            }
+        }
+    }
+
+    /*******************************************************************************************
+     *                                     Bluetooth                                           *
+     *******************************************************************************************/
 
     private fun startAdvertising() {
         val advertisingOptions = AdvertisingOptions.Builder().setStrategy(STRATEGY).build()

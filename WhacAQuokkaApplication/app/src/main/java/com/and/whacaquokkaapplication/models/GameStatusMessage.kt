@@ -8,6 +8,8 @@ import kotlinx.serialization.Serializable
 // val json = Json.encodeToString(Data(42, "str"))
 // val obj = Json.decodeFromString<Data>("""{"a":42, "b": "str"}""")
 // val str = String(byteArray)
+
+// test sendpayload line 173
 enum class GameStatusMessage {
     START,
     STOP,
