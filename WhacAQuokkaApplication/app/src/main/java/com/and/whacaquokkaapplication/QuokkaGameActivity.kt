@@ -2,10 +2,13 @@ package com.and.whacaquokkaapplication
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.widget.ImageView
 import android.widget.TextView
+import com.and.whacaquokkaapplication.bluetoothmanager.ConnectionsActivity
+import com.google.android.gms.nearby.connection.Payload
 
-class QuokkaGameActivity : AppCompatActivity() {
+class QuokkaGameActivity : ConnectionsActivity() {
 
     private lateinit var scoreTextView : TextView
     private lateinit var timeTextView : TextView
@@ -84,5 +87,13 @@ class QuokkaGameActivity : AppCompatActivity() {
             quokka9.setImageResource(R.drawable.quokka)
             // TODO
         }
+
+
+        send(Payload.fromBytes("Quokka world".toByteArray()))
+    }
+
+    override fun onReceive(endpoint: Endpoint?, payload: Payload?) {
+        val data = payload?.asBytes()?.let { String(it) }
+        Log.println(Log.INFO, "QuokkaGameActivity", "Received: $data")
     }
 }
