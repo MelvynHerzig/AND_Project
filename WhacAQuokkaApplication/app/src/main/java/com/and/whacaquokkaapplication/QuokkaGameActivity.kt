@@ -5,9 +5,12 @@ import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.MotionEvent
 import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.and.whacaquokkaapplication.databinding.ActivityQuokkaGameBinding
 import com.and.whacaquokkaapplication.Game
+import com.and.whacaquokkaapplication.bluetoothmanager.BluetoothConnectionService
+import com.google.android.gms.nearby.connection.Payload
 
 
 class QuokkaGameActivity : AppCompatActivity() {

@@ -51,7 +51,7 @@ class MainActivity : AppCompatActivity() {
                 ) {
                     val dialog = AlertDialog.Builder(this@MainActivity)
                         .setTitle("Connexion à un partenaire de jeu")
-                        .setMessage("Voulez-vous vous connecter à " + connectionInfo!!.endpointName)
+                        .setMessage("Voulez-vous vous connecter à ${endpoint?.name} ?")
                         .setCancelable(false) // dialog cannot be closed without doing a choice
                         .setNegativeButton(android.R.string.cancel) { _, _ ->
                             BluetoothConnectionService.instance.rejectConnection(endpoint!!)

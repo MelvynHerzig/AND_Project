@@ -109,6 +109,7 @@ class WhackGameActivity : AppCompatActivity() {
     }
 
     override fun onDestroy() {
+        BluetoothConnectionService.instance.disconnectFromAllEndpoints()
         game.exitGame()
         super.onDestroy()
     }
