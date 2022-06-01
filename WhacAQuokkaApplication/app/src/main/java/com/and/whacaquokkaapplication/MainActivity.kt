@@ -4,13 +4,14 @@ import android.app.AlertDialog
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.provider.Settings
-import android.util.Log
 import com.google.android.gms.nearby.connection.*
 import android.widget.TextView
-import com.and.whacaquokkaapplication.bluetoothmanager.ConnectionsActivity
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import com.and.whacaquokkaapplication.bluetoothmanager.BluetoothConnectionService
+import com.google.android.gms.nearby.Nearby
 
-class MainActivity : ConnectionsActivity() {
+class MainActivity : AppCompatActivity() {
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -19,11 +20,106 @@ class MainActivity : ConnectionsActivity() {
         setContentView(R.layout.activity_main)
 
 
+        BluetoothConnectionService.instance.mConnectionsClient =
+            Nearby.getConnectionsClient(this.applicationContext)
+
+        BluetoothConnectionService.instance.advertisingListener =
+            object : BluetoothConnectionService.AdvertisingListener {
+                override fun onAdvertisingStarted() {
+                    Toast.makeText(
+                        this@MainActivity,
+                        "Advertising successfully started",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+
+                override fun onAdvertisingFailed() {
+                    Toast.makeText(
+                        this@MainActivity,
+                        "Advertising failed",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+        BluetoothConnectionService.instance.connectionListener =
+            object : BluetoothConnectionService.ConnectionListener {
+                override fun onConnectionInitiated(
+                    endpoint: BluetoothConnectionService.Endpoint?,
+                    connectionInfo: ConnectionInfo?
+                ) {
+                    val dialog = AlertDialog.Builder(this@MainActivity)
+                        .setTitle("Connexion à un partenaire de jeu")
+                        .setMessage("Voulez-vous vous connecter à " + connectionInfo!!.endpointName)
+                        .setCancelable(false) // dialog cannot be closed without doing a choice
+                        .setNegativeButton(android.R.string.cancel) { _, _ ->
+                            BluetoothConnectionService.instance.rejectConnection(endpoint!!)
+                        }
+                        .setPositiveButton(android.R.string.yes) { _, _ ->
+                            BluetoothConnectionService.instance.acceptConnection(endpoint!!)
+                        }
+                        .create()
+                    dialog.show()
+                }
+
+                override fun onConnectionFailed(endpoint: BluetoothConnectionService.Endpoint?) {
+                    Toast.makeText(
+                        this@MainActivity,
+                        "Connection failed",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+        BluetoothConnectionService.instance.discoveringListener =
+            object : BluetoothConnectionService.DiscoveringListener {
+                override fun onDiscoveryStarted() {
+                    Toast.makeText(
+                        this@MainActivity,
+                        "Discovery successfully started",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+
+                override fun onDiscoveryFailed() {
+                    Toast.makeText(
+                        this@MainActivity,
+                        "Discovery failed",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+        BluetoothConnectionService.instance.endpointListener =
+            object : BluetoothConnectionService.EndpointListener {
+                override fun onEndpointDiscovered(endpoint: BluetoothConnectionService.Endpoint?) {
+                    BluetoothConnectionService.instance.connectToEndpoint(endpoint!!)
+                }
+
+                override fun onEndpointConnected(endpoint: BluetoothConnectionService.Endpoint?) {
+                    if(BluetoothConnectionService.instance.isAdvertising){
+                        BluetoothConnectionService.instance.stopAdvertising()
+                        val intent = Intent(this@MainActivity, QuokkaGameActivity::class.java)
+                        startActivity(intent)
+                    }else{
+                        BluetoothConnectionService.instance.stopDiscovering()
+                        val intent = Intent(this@MainActivity, WhackGameActivity::class.java)
+                        startActivity(intent)
+                    }
+
+                }
+
+                override fun onEndpointDisconnected(endpoint: BluetoothConnectionService.Endpoint?) {
+                    Toast.makeText(
+                        this@MainActivity,
+                        "Disconnected",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+
         findViewById<TextView>(R.id.advert_button).setOnClickListener {
             if (!Permission.hasPermissions(this)) {
                 Permission.requestPermissionsDiscovery(this)
             } else {
-                startAdvertising()
+                BluetoothConnectionService.instance.startAdvertising()
             }
         }
 
@@ -31,7 +127,7 @@ class MainActivity : ConnectionsActivity() {
             if (!Permission.hasPermissions(this)) {
                 Permission.requestPermissionsAdvertising(this)
             } else {
-                startDiscovering()
+                BluetoothConnectionService.instance.startDiscovering()
             }
         }
     }
@@ -55,52 +151,15 @@ class MainActivity : ConnectionsActivity() {
         // On all success start advertising
         if (requestCode == Permission.ADVERTISING_CODE) {
             if (grantResults.isNotEmpty() && grantResults.all { it == PackageManager.PERMISSION_GRANTED }) {
-                startAdvertising()
+                BluetoothConnectionService.instance.startAdvertising()
             }
         }
 
         // On all success start discovery
         if (requestCode == Permission.DISCOVERY_CODE) {
             if (grantResults.isNotEmpty() && grantResults.all { it == PackageManager.PERMISSION_GRANTED }) {
-                startDiscovering()
+                BluetoothConnectionService.instance.startDiscovering()
             }
         }
     }
-
-    override fun onConnectionInitiated(endpoint: Endpoint?, connectionInfo: ConnectionInfo?) {
-
-
-        val dialog = AlertDialog.Builder(this@MainActivity)
-            .setTitle("Connexion à un partenaire de jeu")
-            .setMessage("Voulez-vous vous connecter à " + connectionInfo!!.endpointName)
-            .setCancelable(false) // dialog cannot be closed without doing a choice
-            .setNegativeButton(android.R.string.cancel) { _, _ ->
-                rejectConnection(endpoint!!)
-            }
-            .setPositiveButton(android.R.string.yes) { _, _ ->
-                acceptConnection(endpoint!!)
-            }
-            .create()
-        dialog.show()
-
-    }
-
-    override fun onEndpointDiscovered(endpoint: Endpoint?) {
-        Log.println(Log.INFO, "MainActivity", "Endpoint discovered")
-        connectToEndpoint(endpoint!!)
-    }
-
-    override fun onEndpointConnected(endpoint: Endpoint?) {
-        Log.println(Log.INFO, "MainActivity", "Endpoint connected")
-        send(Payload.fromBytes("hello world".toByteArray()))
-        val intent = Intent(this, QuokkaGameActivity::class.java)
-        startActivity(intent)
-    }
-
-
-    override fun onReceive(endpoint: Endpoint?, payload: Payload?) {
-        val bytes = payload!!.asBytes()
-        Log.println(Log.INFO, "MainActivity", "Received bytes: " + bytes?.let { String(it) })
-    }
-
 }

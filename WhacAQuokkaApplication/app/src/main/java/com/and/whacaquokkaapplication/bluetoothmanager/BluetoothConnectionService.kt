@@ -1,80 +1,109 @@
 package com.and.whacaquokkaapplication.bluetoothmanager
 
 import android.util.Log
-import android.widget.Toast
 import com.google.android.gms.nearby.connection.*
-import java.util.ArrayList
-import java.util.HashMap
-import java.util.HashSet
 
-class BluetoothConnectionService private constructor()  {
+/**
+ * Inspiré par :
+ * - https://medium.com/@TusharKhattar/google-nearby-connection-persisting-connection-across-different-activities-1ffbc428df5
+ * - https://github.com/googlearchive/android-nearby/blob/master/connections/walkietalkie/app/src/main/java/com/google/location/nearby/apps/walkietalkie/ConnectionsActivity.java
+ */
+class BluetoothConnectionService private constructor() {
 
-     interface BluetoothConnectionServiceListener {
+
+    interface AdvertisingListener {
         /** Called when advertising successfully starts. Override this method to act on the event.  */
         fun onAdvertisingStarted()
 
-         /** Called when advertising fails to start. Override this method to act on the event.  */
-         fun onAdvertisingFailed()
+        /** Called when advertising fails to start. Override this method to act on the event.  */
+        fun onAdvertisingFailed()
+    }
 
-         /**
+    interface ConnectionListener {
+        /**
          * Called when a pending connection with a remote endpoint is created. Use [ConnectionInfo]
          * for metadata about the connection (like incoming vs outgoing, or the authentication token). If
          * we want to continue with the connection, call [.acceptConnection]. Otherwise,
          * call [.rejectConnection].
          */
-         fun onConnectionInitiated(endpoint: ConnectionsActivity.Endpoint?, connectionInfo: ConnectionInfo?)
+        fun onConnectionInitiated(
+            endpoint: Endpoint?,
+            connectionInfo: ConnectionInfo?
+        )
 
-         /** Called when discovery successfully starts. Override this method to act on the event.  */
-         fun onDiscoveryStarted()
-
-         /** Called when discovery fails to start. Override this method to act on the event.  */
-         fun onDiscoveryFailed()
-
-         /**
-          * Called when a remote endpoint is discovered. To connect to the device, call [ ][.connectToEndpoint].
-          */
-         fun onEndpointDiscovered(endpoint: ConnectionsActivity.Endpoint?)
-
-         /**
-          * Called when a connection with this endpoint has failed. Override this method to act on the
-          * event.
-          */
-         fun onConnectionFailed(endpoint: ConnectionsActivity.Endpoint?)
-
-         /** Called when someone has connected to us. Override this method to act on the event.  */
-         fun onEndpointConnected(endpoint: ConnectionsActivity.Endpoint?)
-
-         /** Called when someone has disconnected. Override this method to act on the event.  */
-         fun onEndpointDisconnected(endpoint: ConnectionsActivity.Endpoint?)
-
-         /**
-          * Someone connected to us has sent us data. Override this method to act on the event.
-          *
-          * @param endpoint The sender.
-          * @param payload The data.
-          */
-         fun onReceive(endpoint: ConnectionsActivity.Endpoint?, payload: Payload?)
+        /**
+         * Called when a connection with this endpoint has failed. Override this method to act on the
+         * event.
+         */
+        fun onConnectionFailed(endpoint: Endpoint?)
     }
 
+    interface DiscoveringListener {
+        /** Called when discovery successfully starts. Override this method to act on the event.  */
+        fun onDiscoveryStarted()
+
+        /** Called when discovery fails to start. Override this method to act on the event.  */
+        fun onDiscoveryFailed()
+    }
+
+    interface EndpointListener {
+        /**
+         * Called when a remote endpoint is discovered. To connect to the device, call [ ][.connectToEndpoint].
+         */
+        fun onEndpointDiscovered(endpoint: Endpoint?)
+
+        /** Called when someone has connected to us. Override this method to act on the event.  */
+        fun onEndpointConnected(endpoint: Endpoint?)
+
+        /** Called when someone has disconnected. Override this method to act on the event.  */
+        fun onEndpointDisconnected(endpoint: Endpoint?)
+    }
+
+    interface DataListener {
+        /**
+         * Someone connected to us has sent us data. Override this method to act on the event.
+         *
+         * @param endpoint The sender.
+         * @param payload The data.
+         */
+        fun onReceive(endpoint: Endpoint?, payload: Payload?)
+    }
+
+
+
+    /** Listener for data received events.  */
+    var dataListener: DataListener? = null
+
     /** Listener for connection events.  */
-    var mBluetoothConnectionServiceListener: BluetoothConnectionServiceListener? = null
+    var connectionListener: ConnectionListener? = null
+
+    /** Listener for endpoint discovery events.  */
+    var endpointListener: EndpointListener? = null
+
+    /** Listener for advertising events.  */
+    var advertisingListener: AdvertisingListener? = null
+
+    /** Listener for discovery events.  */
+    var discoveringListener: DiscoveringListener? = null
+
 
     /** Our handler to Nearby Connections.  */
-    private var mConnectionsClient: ConnectionsClient? = null
+    var mConnectionsClient: ConnectionsClient? = null
 
     /** The devices we've discovered near us.  */
-    private val mDiscoveredEndpoints: MutableMap<String, ConnectionsActivity.Endpoint> = HashMap()
+    private val mDiscoveredEndpoints: MutableMap<String, Endpoint> = HashMap()
 
     /**
      * The devices we have pending connections to. They will stay pending until we call [ ][.acceptConnection] or [.rejectConnection].
      */
-    private val mPendingConnections: MutableMap<String, ConnectionsActivity.Endpoint> = HashMap()
+    private val mPendingConnections: MutableMap<String, Endpoint> = HashMap()
 
     /**
      * The devices we are currently connected to. For advertisers, this may be large. For discoverers,
      * there will only be one entry in this map.
      */
-    private val mEstablishedConnections: MutableMap<String, ConnectionsActivity.Endpoint?> = HashMap()
+    private val mEstablishedConnections: MutableMap<String, Endpoint?> =
+        HashMap()
     /** Returns `true` if we're currently attempting to connect to another device.  */
     /**
      * True if we are asking a discovered device to connect to us. While we ask, we cannot ask another
@@ -99,9 +128,9 @@ class BluetoothConnectionService private constructor()  {
                     "onConnectionInitiated(endpointId=%s, endpointName=%s)",
                     endpointId, connectionInfo.endpointName
                 )
-                val endpoint = ConnectionsActivity.Endpoint(endpointId, connectionInfo.endpointName)
+                val endpoint = Endpoint(endpointId, connectionInfo.endpointName)
                 mPendingConnections[endpointId] = endpoint
-                mBluetoothConnectionServiceListener?.onConnectionInitiated(endpoint, connectionInfo)
+                connectionListener?.onConnectionInitiated(endpoint, connectionInfo)
             }
 
             override fun onConnectionResult(endpointId: String, result: ConnectionResolution) {
@@ -114,7 +143,11 @@ class BluetoothConnectionService private constructor()  {
                 // We're no longer connecting
                 isConnecting = false
                 if (!result.status.isSuccess) {
-                    mBluetoothConnectionServiceListener?.onConnectionFailed(mPendingConnections.remove(endpointId))
+                    connectionListener?.onConnectionFailed(
+                        mPendingConnections.remove(
+                            endpointId
+                        )
+                    )
                     return
                 }
                 connectedToEndpoint(mPendingConnections.remove(endpointId))
@@ -132,7 +165,7 @@ class BluetoothConnectionService private constructor()  {
     /** Callbacks for payloads (bytes of data) sent from another device to us.  */
     private val mPayloadCallback: PayloadCallback = object : PayloadCallback() {
         override fun onPayloadReceived(endpointId: String, payload: Payload) {
-            onReceive(mEstablishedConnections[endpointId], payload)
+            dataListener?.onReceive(mEstablishedConnections[endpointId], payload)
         }
 
         override fun onPayloadTransferUpdate(endpointId: String, update: PayloadTransferUpdate) {
@@ -147,20 +180,20 @@ class BluetoothConnectionService private constructor()  {
 
         val localEndpointName = name
         val advertisingOptions = AdvertisingOptions.Builder()
-        advertisingOptions.setStrategy(strategy!!)
+        advertisingOptions.setStrategy(strategy)
         mConnectionsClient!!
             .startAdvertising(
-                localEndpointName!!,
+                localEndpointName,
                 serviceId,
                 mConnectionLifecycleCallback,
                 advertisingOptions.build()
             )
             .addOnSuccessListener {
-                mBluetoothConnectionServiceListener?.onAdvertisingStarted()
+                advertisingListener?.onAdvertisingStarted()
             }
-            .addOnFailureListener { e ->
+            .addOnFailureListener {
                 isAdvertising = false
-                mBluetoothConnectionServiceListener?.onAdvertisingFailed()
+                advertisingListener?.onAdvertisingFailed()
             }
     }
 
@@ -171,15 +204,15 @@ class BluetoothConnectionService private constructor()  {
     }
 
     /** Accepts a connection request.  */
-    fun acceptConnection(endpoint: ConnectionsActivity.Endpoint) {
-        Log.println(Log.INFO, "ConnectionsActivity", "acceptConnection($endpoint)")
+    fun acceptConnection(endpoint: Endpoint) {
+        Log.println(Log.INFO, "BluetoothConnectionService", "acceptConnection($endpoint)")
         mConnectionsClient!!
             .acceptConnection(endpoint.id, mPayloadCallback)
             .addOnFailureListener { e -> println(e) }
     }
 
     /** Rejects a connection request.  */
-    fun rejectConnection(endpoint: ConnectionsActivity.Endpoint) {
+    fun rejectConnection(endpoint: Endpoint) {
         mConnectionsClient!!
             .rejectConnection(endpoint.id)
             .addOnFailureListener { e -> println(e) }
@@ -206,9 +239,9 @@ class BluetoothConnectionService private constructor()  {
                         )
                         if (serviceId == info.serviceId) {
                             val endpoint =
-                                ConnectionsActivity.Endpoint(endpointId, info.endpointName)
+                                Endpoint(endpointId, info.endpointName)
                             mDiscoveredEndpoints[endpointId] = endpoint
-                            mBluetoothConnectionServiceListener?.onEndpointDiscovered(endpoint)
+                            endpointListener?.onEndpointDiscovered(endpoint)
                         }
                     }
 
@@ -217,10 +250,10 @@ class BluetoothConnectionService private constructor()  {
                 },
                 discoveryOptions.build()
             )
-            .addOnSuccessListener { mBluetoothConnectionServiceListener?.onDiscoveryStarted() }
+            .addOnSuccessListener { discoveringListener?.onDiscoveryStarted() }
             .addOnFailureListener { e ->
                 isDiscovering = false
-                mBluetoothConnectionServiceListener?.onDiscoveryFailed()
+                discoveringListener?.onDiscoveryFailed()
             }
     }
 
@@ -232,7 +265,7 @@ class BluetoothConnectionService private constructor()  {
 
 
     /** Disconnects from the given endpoint.  */
-    fun disconnect(endpoint: ConnectionsActivity.Endpoint) {
+    fun disconnect(endpoint: Endpoint) {
         mConnectionsClient!!.disconnectFromEndpoint(endpoint.id)
         mEstablishedConnections.remove(endpoint.id)
     }
@@ -260,7 +293,7 @@ class BluetoothConnectionService private constructor()  {
      * Sends a connection request to the endpoint. Either [.onConnectionInitiated] or [.onConnectionFailed] will be called once we've found out
      * if we successfully reached the device.
      */
-    fun connectToEndpoint(endpoint: ConnectionsActivity.Endpoint) {
+    fun connectToEndpoint(endpoint: Endpoint) {
         // Mark ourselves as connecting so we don't connect multiple times
         isConnecting = true
 
@@ -269,27 +302,38 @@ class BluetoothConnectionService private constructor()  {
             .requestConnection(name!!, endpoint.id, mConnectionLifecycleCallback)
             .addOnFailureListener {
                 isConnecting = false
-                mBluetoothConnectionServiceListener?.onConnectionFailed(endpoint)
+                connectionListener?.onConnectionFailed(endpoint)
             }
     }
 
-    private fun connectedToEndpoint(endpoint: ConnectionsActivity.Endpoint?) {
-        mEstablishedConnections[endpoint!!.id] = endpoint
-        mBluetoothConnectionServiceListener?.onEndpointConnected(endpoint)
+    /**
+     * Remove all listeners.
+     */
+    fun removeListener(){
+        connectionListener = null
+        dataListener = null
+        endpointListener = null
+        advertisingListener = null
+        discoveringListener = null
     }
 
-    private fun disconnectedFromEndpoint(endpoint: ConnectionsActivity.Endpoint?) {
+    private fun connectedToEndpoint(endpoint: Endpoint?) {
+        mEstablishedConnections[endpoint!!.id] = endpoint
+        endpointListener?.onEndpointConnected(endpoint)
+    }
+
+    private fun disconnectedFromEndpoint(endpoint: Endpoint?) {
         mEstablishedConnections.remove(endpoint!!.id)
-        mBluetoothConnectionServiceListener?.onEndpointDisconnected(endpoint)
+        endpointListener?.onEndpointDisconnected(endpoint)
     }
 
 
     /** Returns a list of currently connected endpoints.  */
-    val discoveredEndpoints: Set<ConnectionsActivity.Endpoint>
+    val discoveredEndpoints: Set<Endpoint>
         get() = HashSet(mDiscoveredEndpoints.values)
 
     /** Returns a list of currently connected endpoints.  */
-    val connectedEndpoints: Set<ConnectionsActivity.Endpoint?>
+    val connectedEndpoints: Set<Endpoint?>
         get() = HashSet(mEstablishedConnections.values)
 
     /**
