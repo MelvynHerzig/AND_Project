@@ -1,16 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.and.whacaquokkaapplication">
-
     <!-- Required for Nearby Connections -->
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-
-    <!-- Only required for apps targeting Android 12 and higher -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" /> <!-- Only required for apps targeting Android 12 and higher -->
     <uses-permission android:name="android.permission.BLUETOOTH_ADVERTISE" />
     <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
     <uses-permission android:name="android.permission.BLUETOOTH_SCAN" />
@@ -23,24 +20,28 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.WhacAQuokkaApplication">
         <activity
-            android:name=".MainActivity"
-            android:screenOrientation="portrait"
-            android:exported="true">
-        </activity>
+            android:name=".ConnectionsActivity"
+            android:exported="false" />
         <activity
-            android:name=".QuokkaGameActivity"
-            android:screenOrientation="portrait"
-            android:exported="true" >
+            android:name=".MainActivity"
+            android:exported="true"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
-            android:name=".WhackGameActivity"
-            android:screenOrientation="portrait"
-            android:exported="true" >
+            android:name=".QuokkaGameActivity"
+            android:exported="true"
+            android:screenOrientation="portrait">
+  
         </activity>
+        <activity
+            android:name=".WhackGameActivity"
+            android:exported="true"
+            android:screenOrientation="portrait"></activity>
     </application>
 
 </manifest>

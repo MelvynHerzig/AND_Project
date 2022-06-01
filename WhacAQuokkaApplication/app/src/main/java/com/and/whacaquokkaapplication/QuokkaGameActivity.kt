@@ -17,6 +17,7 @@ class QuokkaGameActivity : AppCompatActivity() {
     private lateinit var game : GameClient
 
     @SuppressLint("ClickableViewAccessibility")
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -132,5 +133,38 @@ class QuokkaGameActivity : AppCompatActivity() {
             }
             true
         }
+
+        BluetoothConnectionService.instance.removeListener();
+
+        // Detecte la déconnexion
+        BluetoothConnectionService.instance.endpointListener =
+            object : BluetoothConnectionService.EndpointListener {
+                override fun onEndpointDiscovered(endpoint: BluetoothConnectionService.Endpoint?) {
+                }
+
+                override fun onEndpointConnected(endpoint: BluetoothConnectionService.Endpoint?) {
+                }
+
+                override fun onEndpointDisconnected(endpoint: BluetoothConnectionService.Endpoint?) {
+                    Toast.makeText(this@QuokkaGameActivity, "Disconnected", Toast.LENGTH_SHORT)
+                        .show()
+                }
+
+            }
+
+        BluetoothConnectionService.instance.dataListener =
+            object : BluetoothConnectionService.DataListener {
+                override fun onReceive(
+                    endpoint: BluetoothConnectionService.Endpoint?,
+                    payload: Payload?
+                ) {
+                    val message = payload!!.asBytes()?.let { String(it) }
+                    Toast.makeText(this@QuokkaGameActivity, message, Toast.LENGTH_SHORT).show()
+                }
+            }
+
+
     }
+
+
 }

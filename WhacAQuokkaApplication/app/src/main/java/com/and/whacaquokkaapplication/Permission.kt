@@ -13,7 +13,7 @@ import androidx.core.app.ActivityCompat
  * @author Herzig Melvyn
  */
 class Permission {
-    companion object{
+    companion object {
 
         /**
          * Code used when requestPermissionsDiscovery call requestPermissions.
@@ -29,10 +29,12 @@ class Permission {
          * Permissions required by WhacAQuokkaApplication
          */
         private val PERMISSIONS = arrayOf(
-            Manifest.permission.BLUETOOTH_ADVERTISE,
-            Manifest.permission.BLUETOOTH_SCAN,
-            Manifest.permission.ACCESS_COARSE_LOCATION,
-            Manifest.permission.ACCESS_FINE_LOCATION
+                Manifest.permission.BLUETOOTH,
+                Manifest.permission.BLUETOOTH_ADVERTISE,
+                Manifest.permission.BLUETOOTH_SCAN,
+                Manifest.permission.BLUETOOTH_CONNECT,
+                Manifest.permission.ACCESS_COARSE_LOCATION,
+                Manifest.permission.ACCESS_FINE_LOCATION
         )
 
         /**
@@ -55,5 +57,7 @@ class Permission {
         fun hasPermissions(context: Context): Boolean = PERMISSIONS.all {
             ActivityCompat.checkSelfPermission(context, it) == PackageManager.PERMISSION_GRANTED
         }
+
+
     }
 }
