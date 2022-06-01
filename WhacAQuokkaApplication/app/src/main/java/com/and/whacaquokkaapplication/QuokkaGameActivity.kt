@@ -1,6 +1,5 @@
 package com.and.whacaquokkaapplication
 
-import android.R.attr.button
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.MotionEvent
