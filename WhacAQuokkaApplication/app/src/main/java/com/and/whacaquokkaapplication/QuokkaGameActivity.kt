@@ -1,106 +1,137 @@
 package com.and.whacaquokkaapplication
 
-import androidx.appcompat.app.AppCompatActivity
+import android.R.attr.button
+import android.annotation.SuppressLint
 import android.os.Bundle
-import android.util.Log
-import android.widget.ImageView
-import android.widget.TextView
-import android.widget.Toast
-import com.and.whacaquokkaapplication.bluetoothmanager.BluetoothConnectionService
-import com.google.android.gms.nearby.connection.Payload
+import android.view.MotionEvent
+import android.view.View
+import androidx.appcompat.app.AppCompatActivity
+import com.and.whacaquokkaapplication.databinding.ActivityQuokkaGameBinding
+import com.and.whacaquokkaapplication.Game
+
 
 class QuokkaGameActivity : AppCompatActivity() {
 
-    private lateinit var scoreTextView: TextView
-    private lateinit var timeTextView: TextView
+    private lateinit var binding: ActivityQuokkaGameBinding
 
-    private lateinit var quitButton: TextView
+    private lateinit var game : GameClient
 
-    private lateinit var quokka1: ImageView
-    private lateinit var quokka2: ImageView
-    private lateinit var quokka3: ImageView
-    private lateinit var quokka4: ImageView
-    private lateinit var quokka5: ImageView
-    private lateinit var quokka6: ImageView
-    private lateinit var quokka7: ImageView
-    private lateinit var quokka8: ImageView
-    private lateinit var quokka9: ImageView
+    @SuppressLint("ClickableViewAccessibility")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_quokka_game)
 
-        scoreTextView = findViewById(R.id.score)
-        timeTextView = findViewById(R.id.time)
+        binding = ActivityQuokkaGameBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        quitButton = findViewById(R.id.quit_image_button)
+        val spawns = arrayOf(
+            binding.spawn1,  binding.spawn2,  binding.spawn3,
+            binding.spawn4,  binding.spawn5, binding.spawn6,
+            binding.spawn7,  binding.spawn8, binding.spawn9
+        )
+        game = GameClient(spawns, binding.scoreWhack, binding.scoreWhack, binding.time)
 
-        quokka1 = findViewById(R.id.quokka_1)
-        quokka2 = findViewById(R.id.quokka_2)
-        quokka3 = findViewById(R.id.quokka_3)
-        quokka4 = findViewById(R.id.quokka_4)
-        quokka5 = findViewById(R.id.quokka_5)
-        quokka6 = findViewById(R.id.quokka_6)
-        quokka7 = findViewById(R.id.quokka_7)
-        quokka8 = findViewById(R.id.quokka_8)
-        quokka9 = findViewById(R.id.quokka_9)
-
-        quitButton.setOnClickListener {
+        binding.quitImageButton.setOnClickListener {
             finish()
         }
 
-        quokka1.setOnClickListener {
-            quokka1.setImageResource(R.drawable.quokka)
-            // TODO
-            BluetoothConnectionService.instance.send(Payload.fromBytes("1".toByteArray()))
+        binding.spawn1Button.setOnTouchListener { _, event ->
+            if (event.action == MotionEvent.ACTION_DOWN) {
+                // Pressed
+                game.quokkaAppear(1)
+            } else if (event.action == MotionEvent.ACTION_UP) {
+                // Released
+                game.quokkaDisappear(1)
+            }
+            true
         }
 
-        quokka2.setOnClickListener {
-            quokka2.setImageResource(R.drawable.quokka)
-            // TODO
-            BluetoothConnectionService.instance.send(Payload.fromBytes("2".toByteArray()))
+        binding.spawn2Button.setOnTouchListener { _, event ->
+            if (event.action == MotionEvent.ACTION_DOWN) {
+                // Pressed
+                game.quokkaAppear(2)
+            } else if (event.action == MotionEvent.ACTION_UP) {
+                // Released
+                game.quokkaDisappear(2)
+            }
+            true
         }
 
-        quokka3.setOnClickListener {
-            quokka3.setImageResource(R.drawable.quokka)
-            // TODO
-            BluetoothConnectionService.instance.send(Payload.fromBytes("3".toByteArray()))
+        binding.spawn3Button.setOnTouchListener { _, event ->
+            if (event.action == MotionEvent.ACTION_DOWN) {
+                // Pressed
+                game.quokkaAppear(3)
+            } else if (event.action == MotionEvent.ACTION_UP) {
+                // Released
+                game.quokkaDisappear(3)
+            }
+            true
         }
 
-        quokka4.setOnClickListener {
-            quokka4.setImageResource(R.drawable.quokka)
-            // TODO
-            BluetoothConnectionService.instance.send(Payload.fromBytes("4".toByteArray()))
+        binding.spawn4Button.setOnTouchListener { _, event ->
+            if (event.action == MotionEvent.ACTION_DOWN) {
+                // Pressed
+                game.quokkaAppear(4)
+            } else if (event.action == MotionEvent.ACTION_UP) {
+                // Released
+                game.quokkaDisappear(4)
+            }
+            true
         }
 
-        quokka5.setOnClickListener {
-            quokka5.setImageResource(R.drawable.quokka)
-            // TODO
-            BluetoothConnectionService.instance.send(Payload.fromBytes("5".toByteArray()))
+        binding.spawn5Button.setOnTouchListener { _, event ->
+            if (event.action == MotionEvent.ACTION_DOWN) {
+                // Pressed
+                game.quokkaAppear(5)
+            } else if (event.action == MotionEvent.ACTION_UP) {
+                // Released
+                game.quokkaDisappear(5)
+            }
+            true
         }
 
-        quokka6.setOnClickListener {
-            quokka6.setImageResource(R.drawable.quokka)
-            // TODO
-            BluetoothConnectionService.instance.send(Payload.fromBytes("6".toByteArray()))
+        binding.spawn6Button.setOnTouchListener { _, event ->
+            if (event.action == MotionEvent.ACTION_DOWN) {
+                // Pressed
+                game.quokkaAppear(6)
+            } else if (event.action == MotionEvent.ACTION_UP) {
+                // Released
+                game.quokkaDisappear(6)
+            }
+            true
         }
 
-        quokka7.setOnClickListener {
-            quokka7.setImageResource(R.drawable.quokka)
-            // TODO
-            BluetoothConnectionService.instance.send(Payload.fromBytes("7".toByteArray()))
+        binding.spawn7Button.setOnTouchListener { _, event ->
+            if (event.action == MotionEvent.ACTION_DOWN) {
+                // Pressed
+                game.quokkaAppear(7)
+            } else if (event.action == MotionEvent.ACTION_UP) {
+                // Released
+                game.quokkaDisappear(7)
+            }
+            true
         }
 
-        quokka8.setOnClickListener {
-            quokka8.setImageResource(R.drawable.quokka)
-            // TODO
-            BluetoothConnectionService.instance.send(Payload.fromBytes("8".toByteArray()))
+        binding.spawn8Button.setOnTouchListener { _, event ->
+            if (event.action == MotionEvent.ACTION_DOWN) {
+                // Pressed
+                game.quokkaAppear(8)
+            } else if (event.action == MotionEvent.ACTION_UP) {
+                // Released
+                game.quokkaDisappear(8)
+            }
+            true
         }
 
-        quokka9.setOnClickListener {
-            quokka9.setImageResource(R.drawable.quokka)
-            // TODO
-            BluetoothConnectionService.instance.send(Payload.fromBytes("9".toByteArray()))
+        binding.spawn9Button.setOnTouchListener { _, event ->
+            if (event.action == MotionEvent.ACTION_DOWN) {
+                // Pressed
+                game.quokkaAppear(9)
+            } else if (event.action == MotionEvent.ACTION_UP) {
+                // Released
+                game.quokkaDisappear(9)
+            }
+            true
         }
 
         BluetoothConnectionService.instance.removeListener();

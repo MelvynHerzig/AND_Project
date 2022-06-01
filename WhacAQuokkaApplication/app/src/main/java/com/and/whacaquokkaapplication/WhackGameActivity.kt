@@ -8,101 +8,77 @@ import android.widget.Toast
 import com.and.whacaquokkaapplication.bluetoothmanager.BluetoothConnectionService
 import com.google.android.gms.nearby.connection.Payload
 
+import com.and.whacaquokkaapplication.databinding.ActivityWhackGameBinding
+
 class WhackGameActivity : AppCompatActivity() {
 
-    private lateinit var scoreTextView : TextView
-    private lateinit var timeTextView : TextView
+    private lateinit var binding: ActivityWhackGameBinding
 
-    private lateinit var quitButton: TextView
-
-    private lateinit var hole1 : ImageView
-    private lateinit var hole2 : ImageView
-    private lateinit var hole3 : ImageView
-    private lateinit var hole4 : ImageView
-    private lateinit var hole5 : ImageView
-    private lateinit var hole6 : ImageView
-    private lateinit var hole7 : ImageView
-    private lateinit var hole8 : ImageView
-    private lateinit var hole9 : ImageView
+    private lateinit var game : GameMaster
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_whack_game)
 
-        scoreTextView = findViewById(R.id.score)
-        timeTextView = findViewById(R.id.time)
+        binding = ActivityWhackGameBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        quitButton = findViewById(R.id.quit_image_button)
+        val spawns = arrayOf(
+            binding.spawn1,  binding.spawn2,  binding.spawn3,
+            binding.spawn4,  binding.spawn5, binding.spawn6,
+            binding.spawn7,  binding.spawn8, binding.spawn9
+        )
+        game = GameMaster(spawns, binding.scoreQuokka, binding.scoreWhack, binding.time)
 
-        hole1 = findViewById(R.id.hole_1)
-        hole2 = findViewById(R.id.hole_2)
-        hole3 = findViewById(R.id.hole_3)
-        hole4 = findViewById(R.id.hole_4)
-        hole5 = findViewById(R.id.hole_5)
-        hole6 = findViewById(R.id.hole_6)
-        hole7 = findViewById(R.id.hole_7)
-        hole8 = findViewById(R.id.hole_8)
-        hole9 = findViewById(R.id.hole_9)
-
-        quitButton.setOnClickListener {
+        binding.quitImageButton.setOnClickListener {
             finish()
         }
-
-        hole1.setOnClickListener {
-            hole1.setImageResource(R.drawable.hole)
-            // TODO
+       
+        binding.spawn1.setOnClickListener {
+            game.hitHole(1)
             BluetoothConnectionService.instance.send(Payload.fromBytes("1".toByteArray()))
         }
 
-        hole2.setOnClickListener {
-            hole2.setImageResource(R.drawable.hole)
-            // TODO
+        binding.spawn2.setOnClickListener {
+            game.hitHole(2)
             BluetoothConnectionService.instance.send(Payload.fromBytes("2".toByteArray()))
         }
 
-        hole3.setOnClickListener {
-            hole3.setImageResource(R.drawable.hole)
-            // TODO
+        binding.spawn3.setOnClickListener {
+            game.hitHole(3)
             BluetoothConnectionService.instance.send(Payload.fromBytes("3".toByteArray()))
         }
 
-        hole4.setOnClickListener {
-            hole4.setImageResource(R.drawable.hole)
-            // TODO
+        binding.spawn4.setOnClickListener {
+            game.hitHole(4)
             BluetoothConnectionService.instance.send(Payload.fromBytes("4".toByteArray()))
         }
 
-        hole5.setOnClickListener {
-            hole5.setImageResource(R.drawable.hole)
-            // TODO
+        binding.spawn5.setOnClickListener {
+            game.hitHole(5)
             BluetoothConnectionService.instance.send(Payload.fromBytes("5".toByteArray()))
         }
 
-        hole6.setOnClickListener {
-            hole6.setImageResource(R.drawable.hole)
-            // TODO
+        binding.spawn6.setOnClickListener {
+            game.hitHole(6)
             BluetoothConnectionService.instance.send(Payload.fromBytes("6".toByteArray()))
         }
 
-        hole7.setOnClickListener {
-            hole7.setImageResource(R.drawable.hole)
-            // TODO
+        binding.spawn7.setOnClickListener {
+            game.hitHole(7)
             BluetoothConnectionService.instance.send(Payload.fromBytes("7".toByteArray()))
         }
 
-        hole8.setOnClickListener {
-            hole8.setImageResource(R.drawable.hole)
-            // TODO
+        binding.spawn8.setOnClickListener {
+            game.hitHole(8)
             BluetoothConnectionService.instance.send(Payload.fromBytes("8".toByteArray()))
         }
 
-        hole9.setOnClickListener {
-            hole9.setImageResource(R.drawable.hole)
-            // TODO
+        binding.spawn9.setOnClickListener {
+            game.hitHole(9)
             BluetoothConnectionService.instance.send(Payload.fromBytes("9".toByteArray()))
         }
-
-        BluetoothConnectionService.instance.removeListener();
+        
+         BluetoothConnectionService.instance.removeListener();
 
         // Detecte la déconnexion
         BluetoothConnectionService.instance.endpointListener =
@@ -130,5 +106,10 @@ class WhackGameActivity : AppCompatActivity() {
                     Toast.makeText(this@WhackGameActivity , message, Toast.LENGTH_SHORT).show()
                 }
             }
+    }
+
+    override fun onDestroy() {
+        game.exitGame()
+        super.onDestroy()
     }
 }
