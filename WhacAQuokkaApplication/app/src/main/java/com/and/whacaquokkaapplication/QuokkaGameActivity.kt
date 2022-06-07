@@ -1,13 +1,13 @@
 package com.and.whacaquokkaapplication
 
 import android.annotation.SuppressLint
+import android.app.AlertDialog
+import android.content.Intent
 import android.os.Bundle
 import android.view.MotionEvent
-import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.and.whacaquokkaapplication.databinding.ActivityQuokkaGameBinding
-import com.and.whacaquokkaapplication.Game
 import com.and.whacaquokkaapplication.bluetoothmanager.BluetoothConnectionService
 import com.google.android.gms.nearby.connection.Payload
 
@@ -56,6 +56,7 @@ class QuokkaGameActivity : AppCompatActivity() {
             game.stopGame()
 
             // TODO end screen (dialog ?)
+            //GameActivity.showEndPopUp(this, it)
         }
 
         // ---------------------- Listeners ---------------------------
@@ -200,5 +201,4 @@ class QuokkaGameActivity : AppCompatActivity() {
         game.stopGame()
         super.onDestroy()
     }
-
 }
