@@ -6,8 +6,6 @@ import android.content.pm.PackageManager
 import android.os.Bundle
 import com.google.android.gms.nearby.connection.*
 import android.widget.TextView
-import android.provider.Settings
-import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.and.whacaquokkaapplication.bluetoothmanager.BluetoothConnectionService
