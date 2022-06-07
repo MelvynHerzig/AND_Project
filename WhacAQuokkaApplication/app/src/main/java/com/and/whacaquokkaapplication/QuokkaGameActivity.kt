@@ -31,7 +31,34 @@ class QuokkaGameActivity : AppCompatActivity() {
             binding.spawn4,  binding.spawn5, binding.spawn6,
             binding.spawn7,  binding.spawn8, binding.spawn9
         )
-        game = GameClient(spawns, binding.scoreWhack, binding.scoreWhack, binding.time)
+        game = GameClient()
+        game.startGame()
+
+        // ---------------------- Game notifications ------------------
+
+        game.scoreQuokka.observe(this){
+            binding.scoreQuokka.text = it.toString()
+        }
+
+        game.scoreWhack.observe(this){
+            binding.scoreWhack.text = it.toString()
+        }
+
+        game.timer.observe(this){
+            binding.time.text = it.toString()
+        }
+
+        game.updateHoleNumber.observe(this){
+            game.updateHolesView(spawns, it)
+        }
+
+        game.gameOver.observe(this){
+            game.stopGame()
+
+            // TODO end screen (dialog ?)
+        }
+
+        // ---------------------- Listeners ---------------------------
 
         binding.quitImageButton.setOnClickListener {
             finish()
@@ -168,5 +195,10 @@ class QuokkaGameActivity : AppCompatActivity() {
 
     }
 
+    override fun onDestroy() {
+        BluetoothConnectionService.instance.disconnectFromAllEndpoints()
+        game.stopGame()
+        super.onDestroy()
+    }
 
 }

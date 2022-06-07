@@ -13,4 +13,4 @@ class ScoreStatusMessage (
     val touched: Boolean,
     val quokkaScore: Int,
     val whackScore: Int
-) : Message(MessageType.GameStatus) {}
+) : Message(MessageType.ScoreStatus) {}

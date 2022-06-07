@@ -12,4 +12,4 @@ import kotlinx.serialization.Serializable
 class QuokkaStatusMessage (
     val number: Int,
     val status: QuokkaStatus
-) : Message(MessageType.GameStatus) {}
+) : Message(MessageType.QuokkaStatus) {}
