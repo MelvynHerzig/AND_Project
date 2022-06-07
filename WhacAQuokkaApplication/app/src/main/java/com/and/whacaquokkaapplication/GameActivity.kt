@@ -6,19 +6,16 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.ImageView
 import android.widget.TextView
+import com.and.whacaquokkaapplication.gamelogic.Game
 
-abstract class GameActivity(
-    spawns: Array<ImageView>,
-    quokkaScore: TextView,
-    whackScore: TextView,
-    time: TextView,
-    game: Game
+abstract class GameActivity constructor(
+    private var spawns: Array<ImageView>,
+    private var quokkaScore: TextView,
+    private var whackScore: TextView,
+    private var time: TextView,
+    private var quitButton: TextView,
+    private var game: Game
 ) : AppCompatActivity() {
-
-    abstract var time: Any
-    abstract var whackScore: Any
-    abstract var quokkaScore: Any
-    abstract val game: Any
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,7 +25,7 @@ abstract class GameActivity(
         // ---------------------- Game notifications ------------------
 
         game.scoreQuokka.observe(this) {
-            quokkaScore = it.toString()
+            quokkaScore.text = it.toString()
         }
 
         game.scoreWhack.observe(this) {
@@ -45,18 +42,16 @@ abstract class GameActivity(
 
         game.gameOver.observe(this){
             game.stopGame()
-
-            // TODO end screen (dialog ?)
-            //showEndPopUp()
+            showEndPopUp(game.didIWin())
         }
 
         // ---------------------- Listeners ---------------------------
-        binding.quitImageButton.setOnClickListener {
+        quitButton.setOnClickListener {
             finish()
         }
     }
 
-    fun showEndPopUp(won: Boolean) {
+    private fun showEndPopUp(won: Boolean) {
         val endMessage: String =
             if (won) getString(R.string.end_game_message_won)
             else getString(R.string.end_game_message_lost)

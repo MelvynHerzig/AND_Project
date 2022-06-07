@@ -7,8 +7,7 @@ import com.and.whacaquokkaapplication.bluetoothmanager.BluetoothConnectionServic
 import com.google.android.gms.nearby.connection.Payload
 
 import com.and.whacaquokkaapplication.databinding.ActivityWhackGameBinding
-import com.and.whacaquokkaapplication.models.GameStatus
-import com.and.whacaquokkaapplication.models.GameStatusMessage
+import com.and.whacaquokkaapplication.gamelogic.GameMaster
 import com.and.whacaquokkaapplication.models.Message
 
 class WhackGameActivity : AppCompatActivity() {
@@ -29,11 +28,11 @@ class WhackGameActivity : AppCompatActivity() {
             binding.spawn7,  binding.spawn8, binding.spawn9
         )
         game = GameMaster()
-        game.startGame()
+        //game.startGame()
 
         // ---------------------- Game notifications ------------------
 
-        game.scoreQuokka.observe(this){
+        /*game.scoreQuokka.observe(this){
             binding.scoreQuokka.text = it.toString()
         }
 
@@ -62,7 +61,7 @@ class WhackGameActivity : AppCompatActivity() {
 
         binding.quitImageButton.setOnClickListener {
             finish()
-        }
+        }*/
        
         binding.spawn1.setOnClickListener {
             game.hitHole(0)

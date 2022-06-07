@@ -2,12 +2,12 @@ package com.and.whacaquokkaapplication
 
 import android.annotation.SuppressLint
 import android.os.Bundle
-import android.util.Log
 import android.view.MotionEvent
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.and.whacaquokkaapplication.databinding.ActivityQuokkaGameBinding
 import com.and.whacaquokkaapplication.bluetoothmanager.BluetoothConnectionService
+import com.and.whacaquokkaapplication.gamelogic.GameClient
 import com.and.whacaquokkaapplication.models.Message
 import com.google.android.gms.nearby.connection.Payload
 
@@ -31,7 +31,7 @@ class QuokkaGameActivity : AppCompatActivity() {
             binding.spawn4,  binding.spawn5, binding.spawn6,
             binding.spawn7,  binding.spawn8, binding.spawn9
         )
-        game = GameClient()
+        //game = GameClient()
 
         // ---------------------- Game notifications ------------------
 
@@ -62,9 +62,9 @@ class QuokkaGameActivity : AppCompatActivity() {
 
         // ---------------------- Listeners ---------------------------
 
-        binding.quitImageButton.setOnClickListener {
+        /*binding.quitImageButton.setOnClickListener {
             finish()
-        }
+        }*/
 
         binding.spawn1Button.setOnTouchListener { _, event ->
             if (event.action == MotionEvent.ACTION_DOWN) {
