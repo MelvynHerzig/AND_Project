@@ -8,41 +8,41 @@ import android.widget.ImageView
 import android.widget.TextView
 import com.and.whacaquokkaapplication.gamelogic.Game
 
-abstract class GameActivity constructor(
-    private var spawns: Array<ImageView>,
-    private var quokkaScore: TextView,
-    private var whackScore: TextView,
-    private var time: TextView,
-    private var quitButton: TextView,
-    private var game: Game
-) : AppCompatActivity() {
+abstract class GameActivity : AppCompatActivity() {
+
+    protected lateinit var spawns: Array<ImageView>
+    protected lateinit var quokkaScore: TextView
+    protected lateinit var whackScore: TextView
+    protected lateinit var time: TextView
+    protected lateinit var quitButton: TextView
+    protected lateinit var abstractGame: Game
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        game.startGame()
+        abstractGame.startGame()
 
         // ---------------------- Game notifications ------------------
 
-        game.scoreQuokka.observe(this) {
+        abstractGame.scoreQuokka.observe(this) {
             quokkaScore.text = it.toString()
         }
 
-        game.scoreWhack.observe(this) {
+        abstractGame.scoreWhack.observe(this) {
             whackScore.text = it.toString()
         }
 
-        game.timer.observe(this) {
+        abstractGame.timer.observe(this) {
             time.text = it.toString()
         }
 
-        game.updateHoleNumber.observe(this) {
-            game.updateHolesView(spawns, it)
+        abstractGame.updateHoleNumber.observe(this) {
+            abstractGame.updateHolesView(spawns, it)
         }
 
-        game.gameOver.observe(this){
-            game.stopGame()
-            showEndPopUp(game.didIWin())
+        abstractGame.gameOver.observe(this){
+            abstractGame.stopGame()
+            showEndPopUp(abstractGame.didIWin())
         }
 
         // ---------------------- Listeners ---------------------------

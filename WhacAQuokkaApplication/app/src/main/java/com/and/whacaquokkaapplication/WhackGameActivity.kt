@@ -1,6 +1,5 @@
 package com.and.whacaquokkaapplication
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
 import com.and.whacaquokkaapplication.bluetoothmanager.BluetoothConnectionService
@@ -10,7 +9,7 @@ import com.and.whacaquokkaapplication.databinding.ActivityWhackGameBinding
 import com.and.whacaquokkaapplication.gamelogic.GameMaster
 import com.and.whacaquokkaapplication.models.Message
 
-class WhackGameActivity : AppCompatActivity() {
+class WhackGameActivity : GameActivity() {
 
     private lateinit var binding: ActivityWhackGameBinding
 
@@ -28,40 +27,19 @@ class WhackGameActivity : AppCompatActivity() {
             binding.spawn7,  binding.spawn8, binding.spawn9
         )
         game = GameMaster()
-        //game.startGame()
 
-        // ---------------------- Game notifications ------------------
-
-        /*game.scoreQuokka.observe(this){
-            binding.scoreQuokka.text = it.toString()
-        }
-
-        game.scoreWhack.observe(this){
-            binding.scoreWhack.text = it.toString()
-        }
-
-        game.timer.observe(this){
-            binding.time.text = it.toString()
-        }
-
-        game.updateHoleNumber.observe(this){
-            game.updateHolesView(spawns, it)
-        }
-
-        game.gameOver.observe(this){
-            if(it) {
-                game.stopGame()
-            }
-
-            // TODO end screen (dialog ?)
-        }
+        // ---------------------- Set Game values ----------------------
+        super.spawns = spawns
+        super.quokkaScore = binding.scoreQuokka
+        super.whackScore = binding.scoreWhack
+        super.time = binding.time
+        super.quitButton = binding.quitImageButton
+        super.abstractGame = game
 
         // ---------------------- Listeners ---------------------------
-
-
         binding.quitImageButton.setOnClickListener {
             finish()
-        }*/
+        }
        
         binding.spawn1.setOnClickListener {
             game.hitHole(0)
