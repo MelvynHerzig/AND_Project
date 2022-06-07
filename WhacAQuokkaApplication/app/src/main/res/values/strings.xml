@@ -2,8 +2,8 @@
     <string name="app_name">Whac A Quokka Application</string>
     <string name="title_image">Title</string>
     <string name="background_image">Background</string>
-    <string name="discover_button">Search a Quokka Player</string>
-    <string name="advert_button">Wait a Wack Player</string>
+    <string name="discover_button">Search a Quokka</string>
+    <string name="advert_button">Wait a Wack</string>
     <string name="quit_button">Quit</string>
     <string name="hole_image">Hole and Quokka</string>
     <string name="quokka_image">Quokka</string>

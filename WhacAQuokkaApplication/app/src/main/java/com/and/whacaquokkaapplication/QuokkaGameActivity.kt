@@ -1,8 +1,6 @@
 package com.and.whacaquokkaapplication
 
 import android.annotation.SuppressLint
-import android.app.AlertDialog
-import android.content.Intent
 import android.os.Bundle
 import android.view.MotionEvent
 import android.widget.Toast
@@ -14,7 +12,7 @@ import com.google.android.gms.nearby.connection.Payload
 
 class QuokkaGameActivity : AppCompatActivity() {
 
-    private lateinit var binding: ActivityQuokkaGameBinding
+    private lateinit var binding : ActivityQuokkaGameBinding
 
     private lateinit var game : GameClient
 
@@ -36,7 +34,7 @@ class QuokkaGameActivity : AppCompatActivity() {
 
         // ---------------------- Game notifications ------------------
 
-        game.scoreQuokka.observe(this){
+        /*game.scoreQuokka.observe(this){
             binding.scoreQuokka.text = it.toString()
         }
 
@@ -57,7 +55,7 @@ class QuokkaGameActivity : AppCompatActivity() {
 
             // TODO end screen (dialog ?)
             //GameActivity.showEndPopUp(this, it)
-        }
+        }*/
 
         // ---------------------- Listeners ---------------------------
 
