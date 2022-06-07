@@ -7,6 +7,9 @@ import com.and.whacaquokkaapplication.bluetoothmanager.BluetoothConnectionServic
 import com.google.android.gms.nearby.connection.Payload
 
 import com.and.whacaquokkaapplication.databinding.ActivityWhackGameBinding
+import com.and.whacaquokkaapplication.models.GameStatus
+import com.and.whacaquokkaapplication.models.GameStatusMessage
+import com.and.whacaquokkaapplication.models.Message
 
 class WhackGameActivity : AppCompatActivity() {
 
@@ -47,63 +50,57 @@ class WhackGameActivity : AppCompatActivity() {
         }
 
         game.gameOver.observe(this){
-            game.stopGame()
+            if(it) {
+                game.stopGame()
+            }
 
             // TODO end screen (dialog ?)
         }
 
         // ---------------------- Listeners ---------------------------
 
+
         binding.quitImageButton.setOnClickListener {
             finish()
         }
        
         binding.spawn1.setOnClickListener {
-            game.hitHole(1)
-            BluetoothConnectionService.instance.send(Payload.fromBytes("1".toByteArray()))
+            game.hitHole(0)
         }
 
         binding.spawn2.setOnClickListener {
-            game.hitHole(2)
-            BluetoothConnectionService.instance.send(Payload.fromBytes("2".toByteArray()))
+            game.hitHole(1)
         }
 
         binding.spawn3.setOnClickListener {
-            game.hitHole(3)
-            BluetoothConnectionService.instance.send(Payload.fromBytes("3".toByteArray()))
+            game.hitHole(2)
         }
 
         binding.spawn4.setOnClickListener {
-            game.hitHole(4)
-            BluetoothConnectionService.instance.send(Payload.fromBytes("4".toByteArray()))
+            game.hitHole(3)
         }
 
         binding.spawn5.setOnClickListener {
-            game.hitHole(5)
-            BluetoothConnectionService.instance.send(Payload.fromBytes("5".toByteArray()))
+            game.hitHole(4)
         }
 
         binding.spawn6.setOnClickListener {
-            game.hitHole(6)
-            BluetoothConnectionService.instance.send(Payload.fromBytes("6".toByteArray()))
+            game.hitHole(5)
         }
 
         binding.spawn7.setOnClickListener {
-            game.hitHole(7)
-            BluetoothConnectionService.instance.send(Payload.fromBytes("7".toByteArray()))
+            game.hitHole(6)
         }
 
         binding.spawn8.setOnClickListener {
-            game.hitHole(8)
-            BluetoothConnectionService.instance.send(Payload.fromBytes("8".toByteArray()))
+            game.hitHole(7)
         }
 
         binding.spawn9.setOnClickListener {
-            game.hitHole(9)
-            BluetoothConnectionService.instance.send(Payload.fromBytes("9".toByteArray()))
+            game.hitHole(8)
         }
         
-         BluetoothConnectionService.instance.removeListener();
+        BluetoothConnectionService.removeListener();
 
         // Detecte la déconnexion
         BluetoothConnectionService.instance.endpointListener =
@@ -115,6 +112,8 @@ class WhackGameActivity : AppCompatActivity() {
                 }
 
                 override fun onEndpointDisconnected(endpoint: BluetoothConnectionService.Endpoint?) {
+                    BluetoothConnectionService.stopAll()
+                    finish()
                     Toast.makeText(this@WhackGameActivity, "Disconnected", Toast.LENGTH_SHORT)
                         .show()
                 }
@@ -127,15 +126,14 @@ class WhackGameActivity : AppCompatActivity() {
                     endpoint: BluetoothConnectionService.Endpoint?,
                     payload: Payload?
                 ) {
-                    val message = payload!!.asBytes()?.let { String(it) }
-                    Toast.makeText(this@WhackGameActivity , message, Toast.LENGTH_SHORT).show()
+                    game.handleMessage(Message.fromPayload(payload!!))
                 }
             }
     }
 
-    override fun onDestroy() {
-        BluetoothConnectionService.instance.disconnectFromAllEndpoints()
+    override fun onStop() {
+        super.onStop()
+        BluetoothConnectionService.disconnectFromAllEndpoints()
         game.stopGame()
-        super.onDestroy()
     }
 }

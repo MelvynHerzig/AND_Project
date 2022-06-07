@@ -2,11 +2,13 @@ package com.and.whacaquokkaapplication
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.util.Log
 import android.view.MotionEvent
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.and.whacaquokkaapplication.databinding.ActivityQuokkaGameBinding
 import com.and.whacaquokkaapplication.bluetoothmanager.BluetoothConnectionService
+import com.and.whacaquokkaapplication.models.Message
 import com.google.android.gms.nearby.connection.Payload
 
 
@@ -30,7 +32,6 @@ class QuokkaGameActivity : AppCompatActivity() {
             binding.spawn7,  binding.spawn8, binding.spawn9
         )
         game = GameClient()
-        game.startGame()
 
         // ---------------------- Game notifications ------------------
 
@@ -51,7 +52,9 @@ class QuokkaGameActivity : AppCompatActivity() {
         }
 
         game.gameOver.observe(this){
-            game.stopGame()
+            if(it)
+
+                game.stopGame()
 
             // TODO end screen (dialog ?)
             //GameActivity.showEndPopUp(this, it)
@@ -66,6 +69,17 @@ class QuokkaGameActivity : AppCompatActivity() {
         binding.spawn1Button.setOnTouchListener { _, event ->
             if (event.action == MotionEvent.ACTION_DOWN) {
                 // Pressed
+                game.quokkaAppear(0)
+            } else if (event.action == MotionEvent.ACTION_UP) {
+                // Released
+                game.quokkaDisappear(0)
+            }
+            true
+        }
+
+        binding.spawn2Button.setOnTouchListener { _, event ->
+            if (event.action == MotionEvent.ACTION_DOWN) {
+                // Pressed
                 game.quokkaAppear(1)
             } else if (event.action == MotionEvent.ACTION_UP) {
                 // Released
@@ -74,7 +88,7 @@ class QuokkaGameActivity : AppCompatActivity() {
             true
         }
 
-        binding.spawn2Button.setOnTouchListener { _, event ->
+        binding.spawn3Button.setOnTouchListener { _, event ->
             if (event.action == MotionEvent.ACTION_DOWN) {
                 // Pressed
                 game.quokkaAppear(2)
@@ -85,7 +99,7 @@ class QuokkaGameActivity : AppCompatActivity() {
             true
         }
 
-        binding.spawn3Button.setOnTouchListener { _, event ->
+        binding.spawn4Button.setOnTouchListener { _, event ->
             if (event.action == MotionEvent.ACTION_DOWN) {
                 // Pressed
                 game.quokkaAppear(3)
@@ -96,7 +110,7 @@ class QuokkaGameActivity : AppCompatActivity() {
             true
         }
 
-        binding.spawn4Button.setOnTouchListener { _, event ->
+        binding.spawn5Button.setOnTouchListener { _, event ->
             if (event.action == MotionEvent.ACTION_DOWN) {
                 // Pressed
                 game.quokkaAppear(4)
@@ -107,7 +121,7 @@ class QuokkaGameActivity : AppCompatActivity() {
             true
         }
 
-        binding.spawn5Button.setOnTouchListener { _, event ->
+        binding.spawn6Button.setOnTouchListener { _, event ->
             if (event.action == MotionEvent.ACTION_DOWN) {
                 // Pressed
                 game.quokkaAppear(5)
@@ -118,7 +132,7 @@ class QuokkaGameActivity : AppCompatActivity() {
             true
         }
 
-        binding.spawn6Button.setOnTouchListener { _, event ->
+        binding.spawn7Button.setOnTouchListener { _, event ->
             if (event.action == MotionEvent.ACTION_DOWN) {
                 // Pressed
                 game.quokkaAppear(6)
@@ -129,7 +143,7 @@ class QuokkaGameActivity : AppCompatActivity() {
             true
         }
 
-        binding.spawn7Button.setOnTouchListener { _, event ->
+        binding.spawn8Button.setOnTouchListener { _, event ->
             if (event.action == MotionEvent.ACTION_DOWN) {
                 // Pressed
                 game.quokkaAppear(7)
@@ -140,7 +154,7 @@ class QuokkaGameActivity : AppCompatActivity() {
             true
         }
 
-        binding.spawn8Button.setOnTouchListener { _, event ->
+        binding.spawn9Button.setOnTouchListener { _, event ->
             if (event.action == MotionEvent.ACTION_DOWN) {
                 // Pressed
                 game.quokkaAppear(8)
@@ -151,18 +165,7 @@ class QuokkaGameActivity : AppCompatActivity() {
             true
         }
 
-        binding.spawn9Button.setOnTouchListener { _, event ->
-            if (event.action == MotionEvent.ACTION_DOWN) {
-                // Pressed
-                game.quokkaAppear(9)
-            } else if (event.action == MotionEvent.ACTION_UP) {
-                // Released
-                game.quokkaDisappear(9)
-            }
-            true
-        }
-
-        BluetoothConnectionService.instance.removeListener();
+        BluetoothConnectionService.removeListener();
 
         // Detecte la déconnexion
         BluetoothConnectionService.instance.endpointListener =
@@ -174,6 +177,8 @@ class QuokkaGameActivity : AppCompatActivity() {
                 }
 
                 override fun onEndpointDisconnected(endpoint: BluetoothConnectionService.Endpoint?) {
+                    BluetoothConnectionService.stopAll()
+                    finish()
                     Toast.makeText(this@QuokkaGameActivity, "Disconnected", Toast.LENGTH_SHORT)
                         .show()
                 }
@@ -186,17 +191,16 @@ class QuokkaGameActivity : AppCompatActivity() {
                     endpoint: BluetoothConnectionService.Endpoint?,
                     payload: Payload?
                 ) {
-                    val message = payload!!.asBytes()?.let { String(it) }
-                    Toast.makeText(this@QuokkaGameActivity, message, Toast.LENGTH_SHORT).show()
+                    game.handleMessage(Message.fromPayload(payload!!))
                 }
             }
 
 
     }
 
-    override fun onDestroy() {
-        BluetoothConnectionService.instance.disconnectFromAllEndpoints()
+    override fun onStop() {
+        super.onStop()
+        BluetoothConnectionService.disconnectFromAllEndpoints()
         game.stopGame()
-        super.onDestroy()
     }
 }
