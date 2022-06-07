@@ -1,14 +1,16 @@
 package com.and.whacaquokkaapplication
 
+import android.os.Message
 import android.widget.ImageView
 import android.widget.TextView
 import java.util.*
 
-abstract class Game (
-            protected val spawns: Array<ImageView>,
-            private val scoreQuokka: TextView,
-            private val scoreWhack: TextView,
-            private val time: TextView) {
+abstract class Game(
+    protected val spawns: Array<ImageView>,
+    private val scoreQuokka: TextView,
+    private val scoreWhack: TextView,
+    private val time: TextView
+) {
 
     protected var lastKnownPosition = 0;
 
@@ -23,7 +25,8 @@ abstract class Game (
     }
 
     protected fun setTime(sec: Int) {
-        time.setText(sec.toString())
+
+        time.text = sec.toString()
     }
 
     protected fun setScore(newScoreQuokka: Int, newScoreWhack: Int) {
@@ -31,18 +34,20 @@ abstract class Game (
         scoreWhack.text = newScoreWhack.toString()
     }
 
-    abstract fun handleMessage()
+    abstract fun handleMessage(message: com.and.whacaquokkaapplication.models.Message)
 
 }
 
-class GameClient ( spawns: Array<ImageView>,
-                   scoreQuokka: TextView,
-                   scoreWhack: TextView,
-                   time: TextView) : Game(spawns, scoreQuokka, scoreWhack, time) {
+class GameClient(
+    spawns: Array<ImageView>,
+    scoreQuokka: TextView,
+    scoreWhack: TextView,
+    time: TextView
+) : Game(spawns, scoreQuokka, scoreWhack, time) {
 
 
     fun quokkaAppear(pos: Int) {
-        if (lastKnownPosition != 0){
+        if (lastKnownPosition != 0) {
             startDisplayQuokka(pos)
 
             // TODO send to master
@@ -57,25 +62,27 @@ class GameClient ( spawns: Array<ImageView>,
         }
     }
 
-    override fun handleMessage(){
+    override fun handleMessage(message: com.and.whacaquokkaapplication.models.Message) {
 
     }
 }
 
-class GameMaster ( spawns: Array<ImageView>,
-                   scoreQuokka: TextView,
-                   scoreWhack: TextView,
-                   time: TextView) : Game(spawns, scoreQuokka, scoreWhack, time) {
+class GameMaster(
+    spawns: Array<ImageView>,
+    scoreQuokka: TextView,
+    scoreWhack: TextView,
+    time: TextView
+) : Game(spawns, scoreQuokka, scoreWhack, time) {
 
-    private var timer : Timer? = null
-    private var scoreTimer : Timer? = null
+    private var timer: Timer? = null
+    private var scoreTimer: Timer? = null
 
     private var seconds = 0
 
     private var scoreQuokaa = 0;
     private var scoreWhack = 0
 
-    fun spawnReceived(pos : Int) {
+    fun spawnReceived(pos: Int) {
         startDisplayQuokka(pos)
 
         scoreTimer = Timer()
@@ -136,7 +143,8 @@ class GameMaster ( spawns: Array<ImageView>,
         scoreTimer!!.cancel()
     }
 
-    override fun handleMessage(){
+    override fun handleMessage(message: com.and.whacaquokkaapplication.models.Message) {
 
     }
+
 }

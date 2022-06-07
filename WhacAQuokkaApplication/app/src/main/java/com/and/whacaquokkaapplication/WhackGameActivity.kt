@@ -7,6 +7,8 @@ import com.and.whacaquokkaapplication.bluetoothmanager.BluetoothConnectionServic
 import com.google.android.gms.nearby.connection.Payload
 
 import com.and.whacaquokkaapplication.databinding.ActivityWhackGameBinding
+import com.and.whacaquokkaapplication.models.GameStatus
+import com.and.whacaquokkaapplication.models.GameStatusMessage
 
 class WhackGameActivity : AppCompatActivity() {
 
@@ -27,17 +29,20 @@ class WhackGameActivity : AppCompatActivity() {
         )
         game = GameMaster(spawns, binding.scoreQuokka, binding.scoreWhack, binding.time)
 
+        BluetoothConnectionService.send(GameStatusMessage(GameStatus.START).toPayload())
+        //game.startGame()
+
         binding.quitImageButton.setOnClickListener {
             finish()
         }
        
         binding.spawn1.setOnClickListener {
-            game.hitHole(1)
+            //game.hitHole(1)
             BluetoothConnectionService.send(Payload.fromBytes("1".toByteArray()))
         }
 
         binding.spawn2.setOnClickListener {
-            game.hitHole(2)
+            //game.hitHole(2)
             BluetoothConnectionService.send(Payload.fromBytes("2".toByteArray()))
         }
 

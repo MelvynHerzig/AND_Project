@@ -2,6 +2,7 @@ package com.and.whacaquokkaapplication
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import android.widget.Toast
@@ -9,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.and.whacaquokkaapplication.databinding.ActivityQuokkaGameBinding
 import com.and.whacaquokkaapplication.Game
 import com.and.whacaquokkaapplication.bluetoothmanager.BluetoothConnectionService
+import com.and.whacaquokkaapplication.models.Message
 import com.google.android.gms.nearby.connection.Payload
 
 
@@ -31,6 +33,7 @@ class QuokkaGameActivity : AppCompatActivity() {
             binding.spawn4,  binding.spawn5, binding.spawn6,
             binding.spawn7,  binding.spawn8, binding.spawn9
         )
+
         game = GameClient(spawns, binding.scoreWhack, binding.scoreWhack, binding.time)
 
         binding.quitImageButton.setOnClickListener {
@@ -160,8 +163,7 @@ class QuokkaGameActivity : AppCompatActivity() {
                     endpoint: BluetoothConnectionService.Endpoint?,
                     payload: Payload?
                 ) {
-                    val message = payload!!.asBytes()?.let { String(it) }
-                    Toast.makeText(this@QuokkaGameActivity, message, Toast.LENGTH_SHORT).show()
+                    game.handleMessage(Message.fromPayload(payload!!))
                 }
             }
 
