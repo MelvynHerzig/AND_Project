@@ -23,6 +23,32 @@ class MainActivity : AppCompatActivity() {
         BluetoothConnectionService.instance.mConnectionsClient =
             Nearby.getConnectionsClient(this.applicationContext)
 
+
+
+
+
+        findViewById<TextView>(R.id.advert_button).setOnClickListener {
+            if (!Permission.hasPermissions(this)) {
+                Permission.requestPermissionsDiscovery(this)
+            } else {
+                BluetoothConnectionService.startAdvertising()
+            }
+        }
+
+        findViewById<TextView>(R.id.discover_button).setOnClickListener {
+            if (!Permission.hasPermissions(this)) {
+                Permission.requestPermissionsAdvertising(this)
+            } else {
+                BluetoothConnectionService.startDiscovering()
+            }
+        }
+
+
+    }
+
+    override fun onResume() {
+        super.onResume()
+
         BluetoothConnectionService.instance.advertisingListener =
             object : BluetoothConnectionService.AdvertisingListener {
                 override fun onAdvertisingStarted() {
@@ -114,26 +140,6 @@ class MainActivity : AppCompatActivity() {
                     ).show()
                 }
             }
-
-
-
-        findViewById<TextView>(R.id.advert_button).setOnClickListener {
-            if (!Permission.hasPermissions(this)) {
-                Permission.requestPermissionsDiscovery(this)
-            } else {
-                BluetoothConnectionService.startAdvertising()
-            }
-        }
-
-        findViewById<TextView>(R.id.discover_button).setOnClickListener {
-            if (!Permission.hasPermissions(this)) {
-                Permission.requestPermissionsAdvertising(this)
-            } else {
-                BluetoothConnectionService.startDiscovering()
-            }
-        }
-
-
     }
 
     /*******************************************************************************************

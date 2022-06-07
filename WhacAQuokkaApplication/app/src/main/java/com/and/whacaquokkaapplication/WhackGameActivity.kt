@@ -112,6 +112,8 @@ class WhackGameActivity : AppCompatActivity() {
                 }
 
                 override fun onEndpointDisconnected(endpoint: BluetoothConnectionService.Endpoint?) {
+                    BluetoothConnectionService.stopAll()
+                    finish()
                     Toast.makeText(this@WhackGameActivity, "Disconnected", Toast.LENGTH_SHORT)
                         .show()
                 }

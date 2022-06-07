@@ -2,6 +2,7 @@ package com.and.whacaquokkaapplication
 
 import android.os.CountDownTimer
 import android.os.Message
+import android.util.Log
 import android.widget.ImageView
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -208,7 +209,9 @@ class GameClient : Game() {
             }
             is ScoreStatusMessage -> {
                 if(message.touched){
-                    flipHoleSate(currentHoleOut)
+                    if(currentHoleOut != -1) {
+                        flipHoleSate(currentHoleOut)
+                    }
                 }
                 setScore(message.quokkaScore, message.whackScore)
             }
@@ -237,16 +240,20 @@ class GameMaster : Game() {
         // Notify UI.
         flipHoleSate(pos)
 
-        if(!startTimer) scoreTimer?.cancel()
+        scoreTimer?.cancel()
+
+        val interval :Long = 400
 
         // Start timer
-        scoreTimer = object : CountDownTimer(120000, 1200) {
+        scoreTimer = object : CountDownTimer(120000, interval) {
             override fun onFinish() {
                 scoreTimer = null
             }
 
             override fun onTick(millisUntilFinished: Long) {
-                if (!isGameOver()) { // If game is not over increase score and send update to client.
+
+                Log.println(Log.INFO, "Score", millisUntilFinished.toString())
+                if (!isGameOver() && millisUntilFinished < 120000-interval) { // If game is not over increase score and send update to client.
                     val updatedScoreQuokka = _scoreQuokka.value!! + 1
                     val updatedScoreWhack = _scoreWhack.value!!
                     setScore(updatedScoreQuokka, updatedScoreWhack)

@@ -393,5 +393,11 @@ class BluetoothConnectionService private constructor() {
         fun send(payload: Payload) {
             instance.send(payload, instance.mEstablishedConnections.keys)
         }
+
+        fun stopAll(){
+            stopAllEndpoints()
+            stopAdvertising()
+            stopDiscovering()
+        }
     }
 }

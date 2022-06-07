@@ -34,7 +34,6 @@ class QuokkaGameActivity : AppCompatActivity() {
             binding.spawn7,  binding.spawn8, binding.spawn9
         )
         game = GameClient()
-        game.startGame()
 
         // ---------------------- Game notifications ------------------
 
@@ -55,7 +54,9 @@ class QuokkaGameActivity : AppCompatActivity() {
         }
 
         game.gameOver.observe(this){
-            game.stopGame()
+            if(it)
+
+                game.stopGame()
 
             // TODO end screen (dialog ?)
         }
@@ -177,6 +178,8 @@ class QuokkaGameActivity : AppCompatActivity() {
                 }
 
                 override fun onEndpointDisconnected(endpoint: BluetoothConnectionService.Endpoint?) {
+                    BluetoothConnectionService.stopAll()
+                    finish()
                     Toast.makeText(this@QuokkaGameActivity, "Disconnected", Toast.LENGTH_SHORT)
                         .show()
                 }
