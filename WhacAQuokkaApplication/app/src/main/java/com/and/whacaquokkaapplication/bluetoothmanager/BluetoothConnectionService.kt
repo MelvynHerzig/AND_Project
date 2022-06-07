@@ -2,6 +2,7 @@ package com.and.whacaquokkaapplication.bluetoothmanager
 
 import android.util.Log
 import com.google.android.gms.nearby.connection.*
+import android.os.Build
 
 /**
  * Inspiré par :
@@ -175,147 +176,6 @@ class BluetoothConnectionService private constructor() {
         }
     }
 
-    fun startAdvertising() {
-        isAdvertising = true
-
-        val localEndpointName = name
-        val advertisingOptions = AdvertisingOptions.Builder()
-        advertisingOptions.setStrategy(strategy)
-        mConnectionsClient!!
-            .startAdvertising(
-                localEndpointName,
-                serviceId,
-                mConnectionLifecycleCallback,
-                advertisingOptions.build()
-            )
-            .addOnSuccessListener {
-                advertisingListener?.onAdvertisingStarted()
-            }
-            .addOnFailureListener {
-                isAdvertising = false
-                advertisingListener?.onAdvertisingFailed()
-            }
-    }
-
-    /** Stops advertising.  */
-    fun stopAdvertising() {
-        isAdvertising = false
-        mConnectionsClient!!.stopAdvertising()
-    }
-
-    /** Accepts a connection request.  */
-    fun acceptConnection(endpoint: Endpoint) {
-        Log.println(Log.INFO, "BluetoothConnectionService", "acceptConnection($endpoint)")
-        mConnectionsClient!!
-            .acceptConnection(endpoint.id, mPayloadCallback)
-            .addOnFailureListener { e -> println(e) }
-    }
-
-    /** Rejects a connection request.  */
-    fun rejectConnection(endpoint: Endpoint) {
-        mConnectionsClient!!
-            .rejectConnection(endpoint.id)
-            .addOnFailureListener { e -> println(e) }
-    }
-
-    /**
-     * Sets the device to discovery mode. It will now listen for devices in advertising mode. Either
-     * [.onDiscoveryStarted] or [.onDiscoveryFailed] will be called once we've found
-     * out if we successfully entered this mode.
-     */
-    fun startDiscovering() {
-        isDiscovering = true
-        mDiscoveredEndpoints.clear()
-        val discoveryOptions = DiscoveryOptions.Builder()
-        discoveryOptions.setStrategy(strategy!!)
-        mConnectionsClient!!
-            .startDiscovery(
-                serviceId,
-                object : EndpointDiscoveryCallback() {
-                    override fun onEndpointFound(endpointId: String, info: DiscoveredEndpointInfo) {
-                        String.format(
-                            "onEndpointFound(endpointId=%s, serviceId=%s, endpointName=%s)",
-                            endpointId, info.serviceId, info.endpointName
-                        )
-                        if (serviceId == info.serviceId) {
-                            val endpoint =
-                                Endpoint(endpointId, info.endpointName)
-                            mDiscoveredEndpoints[endpointId] = endpoint
-                            endpointListener?.onEndpointDiscovered(endpoint)
-                        }
-                    }
-
-                    override fun onEndpointLost(endpointId: String) {
-                    }
-                },
-                discoveryOptions.build()
-            )
-            .addOnSuccessListener { discoveringListener?.onDiscoveryStarted() }
-            .addOnFailureListener { e ->
-                isDiscovering = false
-                discoveringListener?.onDiscoveryFailed()
-            }
-    }
-
-    /** Stops discovery.  */
-    fun stopDiscovering() {
-        isDiscovering = false
-        mConnectionsClient!!.stopDiscovery()
-    }
-
-
-    /** Disconnects from the given endpoint.  */
-    fun disconnect(endpoint: Endpoint) {
-        mConnectionsClient!!.disconnectFromEndpoint(endpoint.id)
-        mEstablishedConnections.remove(endpoint.id)
-    }
-
-    /** Disconnects from all currently connected endpoints.  */
-    fun disconnectFromAllEndpoints() {
-        for (endpoint in mEstablishedConnections.values) {
-            mConnectionsClient!!.disconnectFromEndpoint(endpoint!!.id)
-        }
-        mEstablishedConnections.clear()
-    }
-
-    /** Resets and clears all state in Nearby Connections.  */
-    fun stopAllEndpoints() {
-        mConnectionsClient!!.stopAllEndpoints()
-        isAdvertising = false
-        isDiscovering = false
-        isConnecting = false
-        mDiscoveredEndpoints.clear()
-        mPendingConnections.clear()
-        mEstablishedConnections.clear()
-    }
-
-    /**
-     * Sends a connection request to the endpoint. Either [.onConnectionInitiated] or [.onConnectionFailed] will be called once we've found out
-     * if we successfully reached the device.
-     */
-    fun connectToEndpoint(endpoint: Endpoint) {
-        // Mark ourselves as connecting so we don't connect multiple times
-        isConnecting = true
-
-        // Ask to connect
-        mConnectionsClient!!
-            .requestConnection(name!!, endpoint.id, mConnectionLifecycleCallback)
-            .addOnFailureListener {
-                isConnecting = false
-                connectionListener?.onConnectionFailed(endpoint)
-            }
-    }
-
-    /**
-     * Remove all listeners.
-     */
-    fun removeListener(){
-        connectionListener = null
-        dataListener = null
-        endpointListener = null
-        advertisingListener = null
-        discoveringListener = null
-    }
 
     private fun connectedToEndpoint(endpoint: Endpoint?) {
         mEstablishedConnections[endpoint!!.id] = endpoint
@@ -327,24 +187,6 @@ class BluetoothConnectionService private constructor() {
         endpointListener?.onEndpointDisconnected(endpoint)
     }
 
-
-    /** Returns a list of currently connected endpoints.  */
-    val discoveredEndpoints: Set<Endpoint>
-        get() = HashSet(mDiscoveredEndpoints.values)
-
-    /** Returns a list of currently connected endpoints.  */
-    val connectedEndpoints: Set<Endpoint?>
-        get() = HashSet(mEstablishedConnections.values)
-
-    /**
-     * Sends a [Payload] to all currently connected endpoints.
-     *
-     * @param payload The data you want to send.
-     */
-    fun send(payload: Payload) {
-        send(payload, mEstablishedConnections.keys)
-    }
-
     private fun send(payload: Payload, endpoints: Set<String>) {
         mConnectionsClient!!
             .sendPayload(ArrayList(endpoints), payload)
@@ -353,8 +195,8 @@ class BluetoothConnectionService private constructor() {
 
 
     /** Returns the client's name. Visible to others when connecting.  */
-    // TODO : Get phone name
-    private var name: String = "WhacAQuokka"
+
+    var name: String = "${Build.BRAND} ${Build.MODEL}"
 
     /**
      * Returns the service id. This represents the action this connection is for. When discovering,
@@ -390,5 +232,166 @@ class BluetoothConnectionService private constructor() {
 
     companion object {
         val instance = BluetoothConnectionService()
+
+        fun startAdvertising() {
+            instance.isAdvertising = true
+
+            val localEndpointName = instance.name
+            val advertisingOptions = AdvertisingOptions.Builder()
+            advertisingOptions.setStrategy(instance.strategy)
+            instance.mConnectionsClient!!
+                .startAdvertising(
+                    localEndpointName,
+                    instance.serviceId,
+                    instance.mConnectionLifecycleCallback,
+                    advertisingOptions.build()
+                )
+                .addOnSuccessListener {
+                    instance.advertisingListener?.onAdvertisingStarted()
+                }
+                .addOnFailureListener {
+                    instance.isAdvertising = false
+                    instance.advertisingListener?.onAdvertisingFailed()
+                }
+        }
+
+        /** Stops advertising.  */
+        fun stopAdvertising() {
+            instance.isAdvertising = false
+            instance.mConnectionsClient!!.stopAdvertising()
+        }
+
+        /** Accepts a connection request.  */
+        fun acceptConnection(endpoint: Endpoint) {
+            Log.println(Log.INFO, "BluetoothConnectionService", "acceptConnection($endpoint)")
+            instance.mConnectionsClient!!
+                .acceptConnection(endpoint.id, instance.mPayloadCallback)
+                .addOnFailureListener { e -> println(e) }
+        }
+
+        /** Rejects a connection request.  */
+        fun rejectConnection(endpoint: Endpoint) {
+            instance.mConnectionsClient!!
+                .rejectConnection(endpoint.id)
+                .addOnFailureListener { e -> println(e) }
+        }
+
+        /**
+         * Sets the device to discovery mode. It will now listen for devices in advertising mode. Either
+         * [.onDiscoveryStarted] or [.onDiscoveryFailed] will be called once we've found
+         * out if we successfully entered this mode.
+         */
+        fun startDiscovering() {
+            instance.isDiscovering = true
+            instance.mDiscoveredEndpoints.clear()
+            val discoveryOptions = DiscoveryOptions.Builder()
+            discoveryOptions.setStrategy(instance.strategy!!)
+            instance.mConnectionsClient!!
+                .startDiscovery(
+                    instance.serviceId,
+                    object : EndpointDiscoveryCallback() {
+                        override fun onEndpointFound(endpointId: String, info: DiscoveredEndpointInfo) {
+                            String.format(
+                                "onEndpointFound(endpointId=%s, serviceId=%s, endpointName=%s)",
+                                endpointId, info.serviceId, info.endpointName
+                            )
+                            if (instance.serviceId == info.serviceId) {
+                                val endpoint =
+                                    Endpoint(endpointId, info.endpointName)
+                                instance.mDiscoveredEndpoints[endpointId] = endpoint
+                                instance.endpointListener?.onEndpointDiscovered(endpoint)
+                            }
+                        }
+
+                        override fun onEndpointLost(endpointId: String) {
+                        }
+                    },
+                    discoveryOptions.build()
+                )
+                .addOnSuccessListener { instance.discoveringListener?.onDiscoveryStarted() }
+                .addOnFailureListener { e ->
+                    instance.isDiscovering = false
+                    instance.discoveringListener?.onDiscoveryFailed()
+                }
+        }
+
+        /** Stops discovery.  */
+        fun stopDiscovering() {
+            instance.isDiscovering = false
+            instance.mConnectionsClient!!.stopDiscovery()
+        }
+
+
+        /** Disconnects from the given endpoint.  */
+        fun disconnect(endpoint: Endpoint) {
+            instance.mConnectionsClient!!.disconnectFromEndpoint(endpoint.id)
+            instance.mEstablishedConnections.remove(endpoint.id)
+        }
+
+        /** Disconnects from all currently connected endpoints.  */
+        fun disconnectFromAllEndpoints() {
+            for (endpoint in instance.mEstablishedConnections.values) {
+                instance.mConnectionsClient!!.disconnectFromEndpoint(endpoint!!.id)
+            }
+            instance.mEstablishedConnections.clear()
+        }
+
+        /** Resets and clears all state in Nearby Connections.  */
+        fun stopAllEndpoints() {
+            instance.mConnectionsClient!!.stopAllEndpoints()
+            instance.isAdvertising = false
+            instance.isDiscovering = false
+            instance.isConnecting = false
+            instance.mDiscoveredEndpoints.clear()
+            instance.mPendingConnections.clear()
+            instance.mEstablishedConnections.clear()
+        }
+
+        /**
+         * Sends a connection request to the endpoint. Either [.onConnectionInitiated] or [.onConnectionFailed] will be called once we've found out
+         * if we successfully reached the device.
+         */
+        fun connectToEndpoint(endpoint: Endpoint) {
+            // Mark ourselves as connecting so we don't connect multiple times
+            instance.isConnecting = true
+
+            // Ask to connect
+            instance.mConnectionsClient!!
+                .requestConnection(instance.name!!, endpoint.id, instance.mConnectionLifecycleCallback)
+                .addOnFailureListener {
+                    instance.isConnecting = false
+                    instance.connectionListener?.onConnectionFailed(endpoint)
+                }
+        }
+
+        /**
+         * Remove all listeners.
+         */
+        fun removeListener(){
+            instance.connectionListener = null
+            instance.dataListener = null
+            instance.endpointListener = null
+            instance.advertisingListener = null
+            instance.discoveringListener = null
+        }
+
+
+
+        /** Returns a list of currently connected endpoints.  */
+        val discoveredEndpoints: Set<Endpoint>
+            get() = HashSet(instance.mDiscoveredEndpoints.values)
+
+        /** Returns a list of currently connected endpoints.  */
+        val connectedEndpoints: Set<Endpoint?>
+            get() = HashSet(instance.mEstablishedConnections.values)
+
+        /**
+         * Sends a [Payload] to all currently connected endpoints.
+         *
+         * @param payload The data you want to send.
+         */
+        fun send(payload: Payload) {
+            instance.send(payload, instance.mEstablishedConnections.keys)
+        }
     }
 }

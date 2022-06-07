@@ -136,7 +136,7 @@ class QuokkaGameActivity : AppCompatActivity() {
             true
         }
 
-        BluetoothConnectionService.instance.removeListener();
+        BluetoothConnectionService.removeListener();
 
         // Detecte la déconnexion
         BluetoothConnectionService.instance.endpointListener =

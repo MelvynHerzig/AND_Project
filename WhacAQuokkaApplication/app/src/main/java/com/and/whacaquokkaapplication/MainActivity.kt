@@ -54,10 +54,10 @@ class MainActivity : AppCompatActivity() {
                         .setMessage("Voulez-vous vous connecter à ${endpoint?.name} ?")
                         .setCancelable(false) // dialog cannot be closed without doing a choice
                         .setNegativeButton(android.R.string.cancel) { _, _ ->
-                            BluetoothConnectionService.instance.rejectConnection(endpoint!!)
+                            BluetoothConnectionService.rejectConnection(endpoint!!)
                         }
                         .setPositiveButton(android.R.string.yes) { _, _ ->
-                            BluetoothConnectionService.instance.acceptConnection(endpoint!!)
+                            BluetoothConnectionService.acceptConnection(endpoint!!)
                         }
                         .create()
                     dialog.show()
@@ -92,16 +92,16 @@ class MainActivity : AppCompatActivity() {
         BluetoothConnectionService.instance.endpointListener =
             object : BluetoothConnectionService.EndpointListener {
                 override fun onEndpointDiscovered(endpoint: BluetoothConnectionService.Endpoint?) {
-                    BluetoothConnectionService.instance.connectToEndpoint(endpoint!!)
+                    BluetoothConnectionService.connectToEndpoint(endpoint!!)
                 }
 
                 override fun onEndpointConnected(endpoint: BluetoothConnectionService.Endpoint?) {
                     if(BluetoothConnectionService.instance.isAdvertising){
-                        BluetoothConnectionService.instance.stopAdvertising()
+                        BluetoothConnectionService.stopAdvertising()
                         val intent = Intent(this@MainActivity, QuokkaGameActivity::class.java)
                         startActivity(intent)
                     }else{
-                        BluetoothConnectionService.instance.stopDiscovering()
+                        BluetoothConnectionService.stopDiscovering()
                         val intent = Intent(this@MainActivity, WhackGameActivity::class.java)
                         startActivity(intent)
                     }
@@ -117,11 +117,13 @@ class MainActivity : AppCompatActivity() {
                 }
             }
 
+
+
         findViewById<TextView>(R.id.advert_button).setOnClickListener {
             if (!Permission.hasPermissions(this)) {
                 Permission.requestPermissionsDiscovery(this)
             } else {
-                BluetoothConnectionService.instance.startAdvertising()
+                BluetoothConnectionService.startAdvertising()
             }
         }
 
@@ -129,9 +131,11 @@ class MainActivity : AppCompatActivity() {
             if (!Permission.hasPermissions(this)) {
                 Permission.requestPermissionsAdvertising(this)
             } else {
-                BluetoothConnectionService.instance.startDiscovering()
+                BluetoothConnectionService.startDiscovering()
             }
         }
+
+
     }
 
     /*******************************************************************************************
@@ -153,14 +157,14 @@ class MainActivity : AppCompatActivity() {
         // On all success start advertising
         if (requestCode == Permission.ADVERTISING_CODE) {
             if (grantResults.isNotEmpty() && grantResults.all { it == PackageManager.PERMISSION_GRANTED }) {
-                BluetoothConnectionService.instance.startAdvertising()
+                BluetoothConnectionService.startAdvertising()
             }
         }
 
         // On all success start discovery
         if (requestCode == Permission.DISCOVERY_CODE) {
             if (grantResults.isNotEmpty() && grantResults.all { it == PackageManager.PERMISSION_GRANTED }) {
-                BluetoothConnectionService.instance.startDiscovering()
+                BluetoothConnectionService.startDiscovering()
             }
         }
     }

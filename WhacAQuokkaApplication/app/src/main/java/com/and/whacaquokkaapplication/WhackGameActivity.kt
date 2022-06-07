@@ -33,50 +33,50 @@ class WhackGameActivity : AppCompatActivity() {
        
         binding.spawn1.setOnClickListener {
             game.hitHole(1)
-            BluetoothConnectionService.instance.send(Payload.fromBytes("1".toByteArray()))
+            BluetoothConnectionService.send(Payload.fromBytes("1".toByteArray()))
         }
 
         binding.spawn2.setOnClickListener {
             game.hitHole(2)
-            BluetoothConnectionService.instance.send(Payload.fromBytes("2".toByteArray()))
+            BluetoothConnectionService.send(Payload.fromBytes("2".toByteArray()))
         }
 
         binding.spawn3.setOnClickListener {
             game.hitHole(3)
-            BluetoothConnectionService.instance.send(Payload.fromBytes("3".toByteArray()))
+            BluetoothConnectionService.send(Payload.fromBytes("3".toByteArray()))
         }
 
         binding.spawn4.setOnClickListener {
             game.hitHole(4)
-            BluetoothConnectionService.instance.send(Payload.fromBytes("4".toByteArray()))
+            BluetoothConnectionService.send(Payload.fromBytes("4".toByteArray()))
         }
 
         binding.spawn5.setOnClickListener {
             game.hitHole(5)
-            BluetoothConnectionService.instance.send(Payload.fromBytes("5".toByteArray()))
+            BluetoothConnectionService.send(Payload.fromBytes("5".toByteArray()))
         }
 
         binding.spawn6.setOnClickListener {
             game.hitHole(6)
-            BluetoothConnectionService.instance.send(Payload.fromBytes("6".toByteArray()))
+            BluetoothConnectionService.send(Payload.fromBytes("6".toByteArray()))
         }
 
         binding.spawn7.setOnClickListener {
             game.hitHole(7)
-            BluetoothConnectionService.instance.send(Payload.fromBytes("7".toByteArray()))
+            BluetoothConnectionService.send(Payload.fromBytes("7".toByteArray()))
         }
 
         binding.spawn8.setOnClickListener {
             game.hitHole(8)
-            BluetoothConnectionService.instance.send(Payload.fromBytes("8".toByteArray()))
+            BluetoothConnectionService.send(Payload.fromBytes("8".toByteArray()))
         }
 
         binding.spawn9.setOnClickListener {
             game.hitHole(9)
-            BluetoothConnectionService.instance.send(Payload.fromBytes("9".toByteArray()))
+            BluetoothConnectionService.send(Payload.fromBytes("9".toByteArray()))
         }
         
-         BluetoothConnectionService.instance.removeListener();
+         BluetoothConnectionService.removeListener();
 
         // Detecte la déconnexion
         BluetoothConnectionService.instance.endpointListener =
@@ -107,7 +107,7 @@ class WhackGameActivity : AppCompatActivity() {
     }
 
     override fun onDestroy() {
-        BluetoothConnectionService.instance.disconnectFromAllEndpoints()
+        BluetoothConnectionService.disconnectFromAllEndpoints()
         game.exitGame()
         super.onDestroy()
     }
