@@ -12,5 +12,5 @@ import kotlinx.serialization.Serializable
 enum class GameStatus {
     START,
     STOP,
-    PAUSE
+    PAUSE // Not implemented.
 }

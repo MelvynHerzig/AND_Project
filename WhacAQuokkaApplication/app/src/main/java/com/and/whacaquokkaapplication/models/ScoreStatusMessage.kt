@@ -12,11 +12,11 @@ import kotlinx.serialization.json.Json
  * @author Herzig Melvyn
  */
 @Serializable
-class ScoreStatusMessage (
+class ScoreStatusMessage(
     val touched: Boolean,
     val quokkaScore: Int,
     val whackScore: Int
-) : Message(MessageType.GameStatus) {
+) : Message(MessageType.ScoreStatus) {
     override fun toPayload(): Payload {
         return Payload.fromBytes(Json.encodeToString(this).toByteArray())
     }

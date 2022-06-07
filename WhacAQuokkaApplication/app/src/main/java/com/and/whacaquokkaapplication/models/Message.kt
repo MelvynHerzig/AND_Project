@@ -1,5 +1,6 @@
 package com.and.whacaquokkaapplication.models
 
+import android.util.Log
 import com.and.whacaquokkaapplication.WhackGameActivity
 import com.google.android.gms.nearby.connection.Payload
 import kotlinx.serialization.Serializable
@@ -22,15 +23,22 @@ open class Message(val type: MessageType) {
     companion object {
         private val json = Json { ignoreUnknownKeys = true }
 
-        fun fromPayload(payload: Payload): Message? {
+        fun fromPayload(payload: Payload): Message {
             val str = payload.asBytes()?.let { String(it) }
             val obj = str?.let { json.decodeFromString<Message>(it) }
 
-            return when(obj!!.type){
-                MessageType.GameStatus -> Json.decodeFromString<GameStatusMessage>(str)
-                MessageType.QuokkaStatus -> Json.decodeFromString<QuokkaStatusMessage>(str)
-                MessageType.ScoreStatus -> Json.decodeFromString<ScoreStatusMessage>(str)
+            Log.println(Log.INFO, "dfkjlih gdsfhjz", str!!)
+            Log.println(Log.INFO, "dfkjlih gdsfhjz", obj!!.type.toString())
+
+            val m = when(obj!!.type){
+                MessageType.GameStatus -> json.decodeFromString<GameStatusMessage>(str)
+                MessageType.QuokkaStatus -> json.decodeFromString<QuokkaStatusMessage>(str)
+                MessageType.ScoreStatus -> json.decodeFromString<ScoreStatusMessage>(str)
             }
+
+            Log.println(Log.INFO, "dfkjlih gdsfhjz", m.toString())
+
+            return m
         }
     }
 }

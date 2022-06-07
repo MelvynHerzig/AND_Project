@@ -13,9 +13,9 @@ import kotlinx.serialization.json.Json
  */
 @Serializable
 class QuokkaStatusMessage (
-    val number: Int,
+    val pos: String,
     val status: QuokkaStatus
-) : Message(MessageType.GameStatus) {
+) : Message(MessageType.QuokkaStatus) {
     override fun toPayload(): Payload {
         return Payload.fromBytes(Json.encodeToString(this).toByteArray())
     }
