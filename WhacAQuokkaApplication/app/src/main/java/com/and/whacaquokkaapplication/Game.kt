@@ -1,14 +1,12 @@
 package com.and.whacaquokkaapplication
 
 import android.os.CountDownTimer
-import android.os.Message
 import android.util.Log
 import android.widget.ImageView
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.and.whacaquokkaapplication.bluetoothmanager.BluetoothConnectionService
 import com.and.whacaquokkaapplication.models.*
-import java.util.*
 
 /**
  * Common game logic class shared by game client and master
@@ -102,8 +100,8 @@ abstract class Game {
      * Flip hole state: True <=> False, Quokka up <=> Empty.
      * and update the live data to notify UI to update.
      */
-    protected fun flipHoleSate(pos: Int) {
-        holesState[pos] = !holesState[pos]
+    protected fun setHoleState(pos: Int, show : Boolean) {
+        holesState[pos] = show
         _updateHoleNumber.postValue(pos)
     }
 
@@ -118,7 +116,7 @@ abstract class Game {
      * For a given array of image view, set the corresponding image to the pos th image view.
      */
     fun updateHolesView(holes: Array<ImageView>, pos: Int) {
-        if(pos == -1) return
+        if (pos == -1) return
         if (!holesState[pos]) {
             currentHoleOut = pos
             holes[pos].setImageResource(R.drawable.hole_with_quokka)
@@ -132,7 +130,6 @@ abstract class Game {
      * Start the game, i.e: start the 60s timer.
      */
     open fun startGame() {
-
 
         _timer.postValue(60)
         clockTimer = object : CountDownTimer(60000, 1000) {
@@ -151,12 +148,13 @@ abstract class Game {
      */
     open fun stopGame() {
         clockTimer!!.cancel()
+
     }
 
     /**
      * Handle message from bluetooth connection service.
      */
-    abstract fun handleMessage(message: com.and.whacaquokkaapplication.models.Message)
+    abstract fun handleMessage(message: Message)
 
 }
 
@@ -173,9 +171,14 @@ class GameClient : Game() {
      */
     fun quokkaAppear(pos: Int) {
         if (!isGameOver() && currentHoleOut == -1) { // If game not over and currently no quokka out.
-            flipHoleSate(pos)
+            setHoleState(pos, true)
 
-            BluetoothConnectionService.send(QuokkaStatusMessage(pos.toString(), QuokkaStatus.SHOW).toPayload())
+            BluetoothConnectionService.send(
+                QuokkaStatusMessage(
+                    pos.toString(),
+                    QuokkaStatus.SHOW
+                ).toPayload()
+            )
         }
     }
 
@@ -184,9 +187,14 @@ class GameClient : Game() {
      */
     fun quokkaDisappear(pos: Int) {
         if (!isGameOver() && currentHoleOut == pos) { // If game not over and the quokka is out.
-            flipHoleSate(pos)
+            setHoleState(pos, false)
 
-            BluetoothConnectionService.send(QuokkaStatusMessage(pos.toString(), QuokkaStatus.HIDE).toPayload())
+            BluetoothConnectionService.send(
+                QuokkaStatusMessage(
+                    pos.toString(),
+                    QuokkaStatus.HIDE
+                ).toPayload()
+            )
         }
     }
 
@@ -195,28 +203,30 @@ class GameClient : Game() {
      *
      * @param message Message to handle
      */
-    override fun handleMessage(message: com.and.whacaquokkaapplication.models.Message) {
+    override fun handleMessage(message: Message) {
         when (message) {
             is QuokkaStatusMessage -> {
-                flipHoleSate(message.pos.toInt())
+                setHoleState(message.pos.toInt(), message.status == QuokkaStatus.SHOW)
             }
             is GameStatusMessage -> {
                 if (message.status == GameStatus.STOP) {
-                    stopGame()
+                    _gameOver.postValue(true)
                 } else if (message.status == GameStatus.START) {
                     startGame()
                 }
             }
             is ScoreStatusMessage -> {
-                if(message.touched){
-                    if(currentHoleOut != -1) {
-                        flipHoleSate(currentHoleOut)
+                if (message.touched) {
+                    if (currentHoleOut != -1) {
+                        setHoleState(currentHoleOut, false)
                     }
                 }
                 setScore(message.quokkaScore, message.whackScore)
             }
         }
     }
+
+
 }
 
 /**
@@ -235,14 +245,14 @@ class GameMaster : Game() {
     /**
      * When a quakka spawning is received, start the scoring timer.
      */
-    fun spawnReceived(pos: Int, startTimer : Boolean) {
+    fun spawnReceived(pos: Int, show: Boolean) {
 
         // Notify UI.
-        flipHoleSate(pos)
+        setHoleState(pos, show)
 
         scoreTimer?.cancel()
 
-        val interval :Long = 400
+        val interval: Long = 400
 
         // Start timer
         scoreTimer = object : CountDownTimer(120000, interval) {
@@ -253,7 +263,7 @@ class GameMaster : Game() {
             override fun onTick(millisUntilFinished: Long) {
 
                 Log.println(Log.INFO, "Score", millisUntilFinished.toString())
-                if (!isGameOver() && millisUntilFinished < 120000-interval) { // If game is not over increase score and send update to client.
+                if (!isGameOver() && millisUntilFinished < 120000 - interval) { // If game is not over increase score and send update to client.
                     val updatedScoreQuokka = _scoreQuokka.value!! + 1
                     val updatedScoreWhack = _scoreWhack.value!!
                     setScore(updatedScoreQuokka, updatedScoreWhack)
@@ -269,7 +279,7 @@ class GameMaster : Game() {
             }
         }
 
-        if(startTimer) scoreTimer!!.start()
+        if (show) scoreTimer!!.start()
 
     }
 
@@ -282,7 +292,7 @@ class GameMaster : Game() {
         if (!isGameOver() && currentHoleOut == pos) {
 
             // Notify UI.
-            flipHoleSate(pos)
+            setHoleState(pos, false)
 
             // Stop the scoring timer.
             scoreTimer?.cancel()
@@ -328,7 +338,7 @@ class GameMaster : Game() {
      * @param message message received
      *
      */
-    override fun handleMessage(message: com.and.whacaquokkaapplication.models.Message) {
+    override fun handleMessage(message: Message) {
         when (message) {
             is ScoreStatusMessage -> {
                 throw Exception("ScoreStatusMessage should not be received by master")

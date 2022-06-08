@@ -3,6 +3,7 @@ package com.and.whacaquokkaapplication
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import com.and.whacaquokkaapplication.bluetoothmanager.BluetoothConnectionService
 import com.google.android.gms.nearby.connection.Payload
 
@@ -52,9 +53,24 @@ class WhackGameActivity : AppCompatActivity() {
         game.gameOver.observe(this){
             if(it) {
                 game.stopGame()
-            }
 
-            // TODO end screen (dialog ?)
+                val endMessage: String =
+                    if (game.scoreQuokka.value!! < game.scoreWhack.value!!) getString(R.string.end_game_message_won)
+                    else getString(R.string.end_game_message_lost)
+
+                val dialog = AlertDialog.Builder(this)
+                    .setTitle(getString(R.string.end_game_title))
+                    .setMessage(endMessage)
+                    .setCancelable(true)
+                    .setNegativeButton(getString(R.string.cancel)) { _, _ ->
+                        finish()
+                    }
+                    .setPositiveButton(getString(R.string.ok)) { _, _ ->
+                        finish()
+                    }
+                    .create()
+                dialog.show()
+            }
         }
 
         // ---------------------- Listeners ---------------------------

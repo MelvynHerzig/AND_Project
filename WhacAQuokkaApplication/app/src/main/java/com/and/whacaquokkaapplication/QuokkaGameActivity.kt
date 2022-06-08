@@ -6,6 +6,7 @@ import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.and.whacaquokkaapplication.databinding.ActivityQuokkaGameBinding
 import com.and.whacaquokkaapplication.Game
@@ -54,11 +55,26 @@ class QuokkaGameActivity : AppCompatActivity() {
         }
 
         game.gameOver.observe(this){
-            if(it)
-
+            if(it) {
                 game.stopGame()
 
-            // TODO end screen (dialog ?)
+                val endMessage: String =
+                    if (game.scoreQuokka.value!! > game.scoreWhack.value!!) getString(R.string.end_game_message_won)
+                    else getString(R.string.end_game_message_lost)
+
+                val dialog = AlertDialog.Builder(this)
+                    .setTitle(getString(R.string.end_game_title))
+                    .setMessage(endMessage)
+                    .setCancelable(true)
+                    .setNegativeButton(getString(R.string.cancel)) { _, _ ->
+                        finish()
+                    }
+                    .setPositiveButton(getString(R.string.ok)) { _, _ ->
+                        finish()
+                    }
+                    .create()
+                dialog.show()
+            }
         }
 
         // ---------------------- Listeners ---------------------------
@@ -179,7 +195,6 @@ class QuokkaGameActivity : AppCompatActivity() {
 
                 override fun onEndpointDisconnected(endpoint: BluetoothConnectionService.Endpoint?) {
                     BluetoothConnectionService.stopAll()
-                    finish()
                     Toast.makeText(this@QuokkaGameActivity, "Disconnected", Toast.LENGTH_SHORT)
                         .show()
                 }
