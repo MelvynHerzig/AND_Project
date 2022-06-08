@@ -122,11 +122,11 @@ class MainActivity : AppCompatActivity() {
                 override fun onEndpointConnected(endpoint: BluetoothConnectionService.Endpoint?) {
                     if(BluetoothConnectionService.instance.isAdvertising){
                         BluetoothConnectionService.stopAdvertising()
-                        val intent = Intent(this@MainActivity, QuokkaGameActivity::class.java)
+                        val intent = Intent(this@MainActivity, WhackGameActivity::class.java)
                         startActivity(intent)
                     }else{
                         BluetoothConnectionService.stopDiscovering()
-                        val intent = Intent(this@MainActivity, WhackGameActivity::class.java)
+                        val intent = Intent(this@MainActivity, QuokkaGameActivity::class.java)
                         startActivity(intent)
                     }
 

@@ -18,46 +18,53 @@ class GameMaster : Game() {
      */
     private var scoreTimer: CountDownTimer? = null
 
+
     /**
-     * When a quakka spawning is received, start the scoring timer.
+     * Show or hide quokka at given position
+     * When showing a quokka, start timer to increase score.
+     * when hidding a quokka, stop timer to increase score.
+     *
+     * @param pos Position of quokka to show or hide
+     * @param status Enum to show or hide quokka
      */
-    fun spawnReceived(pos: Int, startTimer : Boolean) {
+    override fun setQuokkaVisiblity(pos: Int, status: QuokkaStatus) {
+        if (isGameOver()) return
+        if (status == QuokkaStatus.HIDE && pos == currentHoleOut) {
+            scoreTimer?.cancel()
+            setHoleState(pos, status)
+        }
+        if (status == QuokkaStatus.SHOW && pos != -1) {
+            scoreTimer?.cancel()
+            setHoleState(pos, status)
 
-        // Notify UI.
-        flipHoleSate(pos)
+            val interval: Long = 400
 
-        scoreTimer?.cancel()
+            // Start timer
+            scoreTimer = object : CountDownTimer(120000, interval) {
+                override fun onFinish() {
+                    scoreTimer = null
+                }
 
-        val interval :Long = 400
+                override fun onTick(millisUntilFinished: Long) {
 
-        // Start timer
-        scoreTimer = object : CountDownTimer(120000, interval) {
-            override fun onFinish() {
-                scoreTimer = null
-            }
+                    if (!isGameOver() && millisUntilFinished < 120000 - interval) {
+                        // If game is not over increase score and send update to client.
+                        val updatedScoreQuokka = _scoreQuokka.value!! + 1
+                        val updatedScoreWhack = _scoreWhack.value!!
+                        setScore(updatedScoreQuokka, updatedScoreWhack)
 
-            override fun onTick(millisUntilFinished: Long) {
-
-                Log.println(Log.INFO, "Score", millisUntilFinished.toString())
-                if (!isGameOver() && millisUntilFinished < 120000-interval) {
-                    // If game is not over increase score and send update to client.
-                    val updatedScoreQuokka = _scoreQuokka.value!! + 1
-                    val updatedScoreWhack = _scoreWhack.value!!
-                    setScore(updatedScoreQuokka, updatedScoreWhack)
-
-                    BluetoothConnectionService.send(
-                        ScoreStatusMessage(
-                            false,
-                            updatedScoreQuokka,
-                            updatedScoreWhack
-                        ).toPayload()
-                    )
+                        BluetoothConnectionService.send(
+                            ScoreStatusMessage(
+                                updatedScoreQuokka,
+                                updatedScoreWhack
+                            ).toPayload()
+                        )
+                    }
                 }
             }
+
+            scoreTimer?.start()
         }
-
-        if(startTimer) scoreTimer!!.start()
-
     }
 
     /**
@@ -69,7 +76,7 @@ class GameMaster : Game() {
         if (!isGameOver() && currentHoleOut == pos) {
 
             // Notify UI.
-            flipHoleSate(pos)
+            setQuokkaVisiblity(pos, QuokkaStatus.HIDE)
 
             // Stop the scoring timer.
             scoreTimer?.cancel()
@@ -80,9 +87,15 @@ class GameMaster : Game() {
             setScore(updatedScoreQuokka, updatedScoreWhack)
 
             // Notify client.
+
+            BluetoothConnectionService.send(
+                QuokkaStatusMessage(
+                    pos,
+                    QuokkaStatus.HIDE
+                ).toPayload()
+            )
             BluetoothConnectionService.send(
                 ScoreStatusMessage(
-                    true,
                     updatedScoreQuokka,
                     updatedScoreWhack
                 ).toPayload()
@@ -95,7 +108,6 @@ class GameMaster : Game() {
      */
     override fun startGame() {
         super.startGame()
-
         BluetoothConnectionService.send(GameStatusMessage(GameStatus.START).toPayload())
     }
 
@@ -115,13 +127,13 @@ class GameMaster : Game() {
      * @param message message received
      *
      */
-    override fun handleMessage(message: com.and.whacaquokkaapplication.models.Message) {
+    override fun handleMessage(message: Message) {
         when (message) {
             is ScoreStatusMessage -> {
                 throw Exception("ScoreStatusMessage should not be received by master")
             }
             is QuokkaStatusMessage -> {
-                spawnReceived(message.pos.toInt(), message.status == QuokkaStatus.SHOW)
+                setQuokkaVisiblity(message.pos, message.status)
             }
             is GameStatusMessage -> {
                 throw Exception("GameStatusMessage should not be received by master")

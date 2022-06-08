@@ -13,7 +13,6 @@ import kotlinx.serialization.json.Json
  */
 @Serializable
 class ScoreStatusMessage(
-    val touched: Boolean,
     val quokkaScore: Int,
     val whackScore: Int
 ) : Message(MessageType.ScoreStatus) {

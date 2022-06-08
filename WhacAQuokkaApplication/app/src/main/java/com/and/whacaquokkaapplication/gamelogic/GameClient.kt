@@ -12,25 +12,20 @@ import com.and.whacaquokkaapplication.models.*
 class GameClient : Game() {
 
     /**
-     * Spawns a quokka on the pos hole and send to master the spawn event.
+     * If possible, set the quokka visible or hidden at the given position.
+     * Send the command to the server.
      */
-    fun quokkaAppear(pos: Int) {
-        if (!isGameOver() && currentHoleOut == -1) { // If game not over and currently no quokka out.
-            flipHoleSate(pos)
-
-            BluetoothConnectionService.send(QuokkaStatusMessage(pos.toString(), QuokkaStatus.SHOW).toPayload())
-        }
-    }
-
-    /**
-     * make dissapear a quokka on the pos hole and send to master the dissapear event.
-     */
-    fun quokkaDisappear(pos: Int) {
-        if (!isGameOver() && currentHoleOut == pos) { // If game not over and the quokka is out.
-            flipHoleSate(pos)
-
-            BluetoothConnectionService.send(QuokkaStatusMessage(pos.toString(), QuokkaStatus.HIDE).toPayload())
-        }
+    override fun setQuokkaVisiblity(pos: Int, status: QuokkaStatus) {
+        if (isGameOver()) return
+        if (pos == -1 && status == QuokkaStatus.SHOW) return
+        if (status == QuokkaStatus.HIDE && pos != currentHoleOut) return
+        setHoleState(pos, status)
+        BluetoothConnectionService.send(
+            QuokkaStatusMessage(
+                pos,
+                status
+            ).toPayload()
+        )
     }
 
     /**
@@ -38,10 +33,10 @@ class GameClient : Game() {
      *
      * @param message Message to handle
      */
-    override fun handleMessage(message: com.and.whacaquokkaapplication.models.Message) {
+    override fun handleMessage(message: Message) {
         when (message) {
             is QuokkaStatusMessage -> {
-                flipHoleSate(message.pos.toInt())
+                setQuokkaVisiblity(message.pos, message.status)
             }
             is GameStatusMessage -> {
                 if (message.status == GameStatus.STOP) {
@@ -51,11 +46,6 @@ class GameClient : Game() {
                 }
             }
             is ScoreStatusMessage -> {
-                if(message.touched){
-                    if(currentHoleOut != -1) {
-                        flipHoleSate(currentHoleOut)
-                    }
-                }
                 setScore(message.quokkaScore, message.whackScore)
             }
         }

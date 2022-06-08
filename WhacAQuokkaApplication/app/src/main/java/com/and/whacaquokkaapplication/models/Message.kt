@@ -27,9 +27,6 @@ open class Message(val type: MessageType) {
             val str = payload.asBytes()?.let { String(it) }
             val obj = str?.let { json.decodeFromString<Message>(it) }
 
-            Log.println(Log.INFO, "dfkjlih gdsfhjz", str!!)
-            Log.println(Log.INFO, "dfkjlih gdsfhjz", obj!!.type.toString())
-
             val m = when(obj!!.type){
                 MessageType.GameStatus -> json.decodeFromString<GameStatusMessage>(str)
                 MessageType.QuokkaStatus -> json.decodeFromString<QuokkaStatusMessage>(str)

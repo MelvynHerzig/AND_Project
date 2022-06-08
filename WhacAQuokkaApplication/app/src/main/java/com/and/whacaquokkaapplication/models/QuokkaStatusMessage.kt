@@ -13,7 +13,7 @@ import kotlinx.serialization.json.Json
  */
 @Serializable
 class QuokkaStatusMessage (
-    val pos: String,
+    val pos: Int,
     val status: QuokkaStatus
 ) : Message(MessageType.QuokkaStatus) {
     override fun toPayload(): Payload {

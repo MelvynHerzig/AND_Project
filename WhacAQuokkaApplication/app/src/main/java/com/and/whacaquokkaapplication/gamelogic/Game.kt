@@ -92,8 +92,8 @@ abstract class Game {
      * Flip hole state: True <=> False, Quokka up <=> Empty.
      * and update the live data to notify UI to update.
      */
-    protected fun flipHoleSate(pos: Int) {
-        holesState[pos] = !holesState[pos]
+    protected fun setHoleState(pos: Int, status : QuokkaStatus) {
+        holesState[pos] = status == QuokkaStatus.HIDE
         _updateHoleNumber.postValue(pos)
     }
 
@@ -142,6 +142,12 @@ abstract class Game {
     open fun stopGame() {
         clockTimer!!.cancel()
     }
+
+    /**
+     * Set the visibility of the quokka at the given position
+     */
+    abstract fun setQuokkaVisiblity(pos: Int, status: QuokkaStatus)
+
 
     /**
      * Handle message from bluetooth connection service.

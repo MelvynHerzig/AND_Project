@@ -13,28 +13,30 @@ class WhackGameActivity : GameActivity() {
 
     private lateinit var binding: ActivityWhackGameBinding
 
-    private lateinit var game : GameMaster
-
     override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
 
         binding = ActivityWhackGameBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val spawns = arrayOf(
+        game = GameMaster()
+
+        val master = game as GameMaster
+
+        // ---------------------- Set Game values ----------------------
+        spawns = arrayOf(
             binding.spawn1,  binding.spawn2,  binding.spawn3,
             binding.spawn4,  binding.spawn5, binding.spawn6,
             binding.spawn7,  binding.spawn8, binding.spawn9
         )
-        game = GameMaster()
+        quokkaScore = binding.scoreQuokka
+        whackScore = binding.scoreWhack
+        time = binding.time
+        quitButton = binding.quitImageButton
 
-        // ---------------------- Set Game values ----------------------
-        super.spawns = spawns
-        super.quokkaScore = binding.scoreQuokka
-        super.whackScore = binding.scoreWhack
-        super.time = binding.time
-        super.quitButton = binding.quitImageButton
-        super.abstractGame = game
+
+        super.onCreate(savedInstanceState)
+
+        game.startGame()
 
         // ---------------------- Listeners ---------------------------
         binding.quitImageButton.setOnClickListener {
@@ -42,39 +44,39 @@ class WhackGameActivity : GameActivity() {
         }
        
         binding.spawn1.setOnClickListener {
-            game.hitHole(0)
+            master.hitHole(0)
         }
 
         binding.spawn2.setOnClickListener {
-            game.hitHole(1)
+            master.hitHole(1)
         }
 
         binding.spawn3.setOnClickListener {
-            game.hitHole(2)
+            master.hitHole(2)
         }
 
         binding.spawn4.setOnClickListener {
-            game.hitHole(3)
+            master.hitHole(3)
         }
 
         binding.spawn5.setOnClickListener {
-            game.hitHole(4)
+            master.hitHole(4)
         }
 
         binding.spawn6.setOnClickListener {
-            game.hitHole(5)
+            master.hitHole(5)
         }
 
         binding.spawn7.setOnClickListener {
-            game.hitHole(6)
+            master.hitHole(6)
         }
 
         binding.spawn8.setOnClickListener {
-            game.hitHole(7)
+            master.hitHole(7)
         }
 
         binding.spawn9.setOnClickListener {
-            game.hitHole(8)
+            master.hitHole(8)
         }
         
         BluetoothConnectionService.removeListener();
@@ -90,7 +92,7 @@ class WhackGameActivity : GameActivity() {
 
                 override fun onEndpointDisconnected(endpoint: BluetoothConnectionService.Endpoint?) {
                     BluetoothConnectionService.stopAll()
-                    finish()
+                    game.stopGame()
                     Toast.makeText(this@WhackGameActivity, "Disconnected", Toast.LENGTH_SHORT)
                         .show()
                 }

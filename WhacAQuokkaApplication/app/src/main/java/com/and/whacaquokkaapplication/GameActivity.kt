@@ -1,11 +1,11 @@
 package com.and.whacaquokkaapplication
 
 import android.app.AlertDialog
-import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.ImageView
 import android.widget.TextView
+import com.and.whacaquokkaapplication.bluetoothmanager.BluetoothConnectionService
 import com.and.whacaquokkaapplication.gamelogic.Game
 
 abstract class GameActivity : AppCompatActivity() {
@@ -15,34 +15,35 @@ abstract class GameActivity : AppCompatActivity() {
     protected lateinit var whackScore: TextView
     protected lateinit var time: TextView
     protected lateinit var quitButton: TextView
-    protected lateinit var abstractGame: Game
+    protected lateinit var game: Game
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        abstractGame.startGame()
 
         // ---------------------- Game notifications ------------------
 
-        abstractGame.scoreQuokka.observe(this) {
+        game.scoreQuokka.observe(this) {
             quokkaScore.text = it.toString()
         }
 
-        abstractGame.scoreWhack.observe(this) {
+        game.scoreWhack.observe(this) {
             whackScore.text = it.toString()
         }
 
-        abstractGame.timer.observe(this) {
+        game.timer.observe(this) {
             time.text = it.toString()
         }
 
-        abstractGame.updateHoleNumber.observe(this) {
-            abstractGame.updateHolesView(spawns, it)
+        game.updateHoleNumber.observe(this) {
+            game.updateHolesView(spawns, it)
         }
 
-        abstractGame.gameOver.observe(this){
-            abstractGame.stopGame()
-            showEndPopUp(abstractGame.didIWin())
+        game.gameOver.observe(this){
+            if(it) {
+                game.stopGame()
+                showEndPopUp(game.didIWin())
+            }
         }
 
         // ---------------------- Listeners ---------------------------
@@ -56,19 +57,18 @@ abstract class GameActivity : AppCompatActivity() {
             if (won) getString(R.string.end_game_message_won)
             else getString(R.string.end_game_message_lost)
 
-        val dialog = AlertDialog.Builder(this)
+        AlertDialog.Builder(this)
             .setTitle(getString(R.string.end_game_title))
             .setMessage(endMessage)
-            .setCancelable(true)
-            .setNegativeButton(getString(R.string.cancel)) { _, _ ->
-                intent = Intent(this, MainActivity::class.java)
-                startActivity(intent)
-            }
             .setPositiveButton(getString(R.string.ok)) { _, _ ->
-                intent = Intent(this, MainActivity::class.java)
-                startActivity(intent)
+                finish()
             }
-            .create()
-        dialog.show()
+            .create().show()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        BluetoothConnectionService.disconnectFromAllEndpoints()
+        game.stopGame()
     }
 }

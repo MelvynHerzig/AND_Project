@@ -2,33 +2,32 @@ package com.and.whacaquokkaapplication
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.util.Log
 import android.view.MotionEvent
 import android.widget.Toast
 import com.and.whacaquokkaapplication.databinding.ActivityQuokkaGameBinding
 import com.and.whacaquokkaapplication.bluetoothmanager.BluetoothConnectionService
 import com.and.whacaquokkaapplication.gamelogic.GameClient
 import com.and.whacaquokkaapplication.models.Message
+import com.and.whacaquokkaapplication.models.QuokkaStatus
 import com.google.android.gms.nearby.connection.Payload
 
 
 class QuokkaGameActivity : GameActivity() {
 
-    private lateinit var binding : ActivityQuokkaGameBinding
+    private lateinit var binding: ActivityQuokkaGameBinding
 
-    private lateinit var game : GameClient
 
     @SuppressLint("ClickableViewAccessibility")
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
         binding = ActivityQuokkaGameBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         val spawns = arrayOf(
-            binding.spawn1,  binding.spawn2,  binding.spawn3,
-            binding.spawn4,  binding.spawn5, binding.spawn6,
-            binding.spawn7,  binding.spawn8, binding.spawn9
+            binding.spawn1, binding.spawn2, binding.spawn3,
+            binding.spawn4, binding.spawn5, binding.spawn6,
+            binding.spawn7, binding.spawn8, binding.spawn9
         )
         game = GameClient()
 
@@ -38,104 +37,89 @@ class QuokkaGameActivity : GameActivity() {
         super.whackScore = binding.scoreWhack
         super.time = binding.time
         super.quitButton = binding.quitImageButton
-        super.abstractGame = game
+        super.game = game
+
+        super.onCreate(savedInstanceState)
+
 
         // ---------------------- Listeners ---------------------------
         binding.spawn1Button.setOnTouchListener { _, event ->
             if (event.action == MotionEvent.ACTION_DOWN) {
-                // Pressed
-                game.quokkaAppear(0)
+                game.setQuokkaVisiblity(0, QuokkaStatus.SHOW)
             } else if (event.action == MotionEvent.ACTION_UP) {
-                // Released
-                game.quokkaDisappear(0)
+                game.setQuokkaVisiblity(0, QuokkaStatus.HIDE)
             }
             true
         }
 
         binding.spawn2Button.setOnTouchListener { _, event ->
             if (event.action == MotionEvent.ACTION_DOWN) {
-                // Pressed
-                game.quokkaAppear(1)
+                game.setQuokkaVisiblity(1, QuokkaStatus.SHOW)
             } else if (event.action == MotionEvent.ACTION_UP) {
-                // Released
-                game.quokkaDisappear(1)
+                game.setQuokkaVisiblity(1, QuokkaStatus.HIDE)
             }
             true
         }
 
         binding.spawn3Button.setOnTouchListener { _, event ->
             if (event.action == MotionEvent.ACTION_DOWN) {
-                // Pressed
-                game.quokkaAppear(2)
+                game.setQuokkaVisiblity(2, QuokkaStatus.SHOW)
             } else if (event.action == MotionEvent.ACTION_UP) {
-                // Released
-                game.quokkaDisappear(2)
+                game.setQuokkaVisiblity(2, QuokkaStatus.HIDE)
             }
             true
         }
 
         binding.spawn4Button.setOnTouchListener { _, event ->
             if (event.action == MotionEvent.ACTION_DOWN) {
-                // Pressed
-                game.quokkaAppear(3)
+                game.setQuokkaVisiblity(3, QuokkaStatus.SHOW)
             } else if (event.action == MotionEvent.ACTION_UP) {
-                // Released
-                game.quokkaDisappear(3)
+                game.setQuokkaVisiblity(3, QuokkaStatus.HIDE)
             }
             true
         }
 
         binding.spawn5Button.setOnTouchListener { _, event ->
             if (event.action == MotionEvent.ACTION_DOWN) {
-                // Pressed
-                game.quokkaAppear(4)
+                game.setQuokkaVisiblity(4, QuokkaStatus.SHOW)
             } else if (event.action == MotionEvent.ACTION_UP) {
-                // Released
-                game.quokkaDisappear(4)
+                game.setQuokkaVisiblity(4, QuokkaStatus.HIDE)
             }
             true
         }
 
         binding.spawn6Button.setOnTouchListener { _, event ->
             if (event.action == MotionEvent.ACTION_DOWN) {
-                // Pressed
-                game.quokkaAppear(5)
+                game.setQuokkaVisiblity(5, QuokkaStatus.SHOW)
             } else if (event.action == MotionEvent.ACTION_UP) {
-                // Released
-                game.quokkaDisappear(5)
+                game.setQuokkaVisiblity(5, QuokkaStatus.HIDE)
             }
             true
         }
 
         binding.spawn7Button.setOnTouchListener { _, event ->
             if (event.action == MotionEvent.ACTION_DOWN) {
-                // Pressed
-                game.quokkaAppear(6)
+                game.setQuokkaVisiblity(6, QuokkaStatus.SHOW)
             } else if (event.action == MotionEvent.ACTION_UP) {
-                // Released
-                game.quokkaDisappear(6)
+                game.setQuokkaVisiblity(6, QuokkaStatus.HIDE)
             }
             true
         }
 
         binding.spawn8Button.setOnTouchListener { _, event ->
             if (event.action == MotionEvent.ACTION_DOWN) {
-                // Pressed
-                game.quokkaAppear(7)
+                game.setQuokkaVisiblity(7, QuokkaStatus.SHOW)
             } else if (event.action == MotionEvent.ACTION_UP) {
-                // Released
-                game.quokkaDisappear(7)
+                game.setQuokkaVisiblity(7, QuokkaStatus.HIDE)
             }
             true
         }
 
         binding.spawn9Button.setOnTouchListener { _, event ->
             if (event.action == MotionEvent.ACTION_DOWN) {
-                // Pressed
-                game.quokkaAppear(8)
+                game.setQuokkaVisiblity(8, QuokkaStatus.SHOW)
             } else if (event.action == MotionEvent.ACTION_UP) {
-                // Released
-                game.quokkaDisappear(8)
+                game.setQuokkaVisiblity(8, QuokkaStatus.HIDE)
             }
             true
         }
@@ -153,7 +137,7 @@ class QuokkaGameActivity : GameActivity() {
 
                 override fun onEndpointDisconnected(endpoint: BluetoothConnectionService.Endpoint?) {
                     BluetoothConnectionService.stopAll()
-                    finish()
+                    game.stopGame()
                     Toast.makeText(this@QuokkaGameActivity, "Disconnected", Toast.LENGTH_SHORT)
                         .show()
                 }
@@ -170,9 +154,5 @@ class QuokkaGameActivity : GameActivity() {
             }
     }
 
-    override fun onStop() {
-        super.onStop()
-        BluetoothConnectionService.disconnectFromAllEndpoints()
-        game.stopGame()
-    }
+
 }
