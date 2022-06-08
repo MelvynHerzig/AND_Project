@@ -2,21 +2,18 @@ package com.and.whacaquokkaapplication
 
 import android.annotation.SuppressLint
 import android.os.Bundle
-import android.util.Log
 import android.view.MotionEvent
-import android.view.View
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import com.and.whacaquokkaapplication.databinding.ActivityQuokkaGameBinding
-import com.and.whacaquokkaapplication.Game
 import com.and.whacaquokkaapplication.bluetoothmanager.BluetoothConnectionService
+import com.and.whacaquokkaapplication.gamelogic.GameClient
 import com.and.whacaquokkaapplication.models.Message
 import com.google.android.gms.nearby.connection.Payload
 
 
-class QuokkaGameActivity : AppCompatActivity() {
+class QuokkaGameActivity : GameActivity() {
 
-    private lateinit var binding: ActivityQuokkaGameBinding
+    private lateinit var binding : ActivityQuokkaGameBinding
 
     private lateinit var game : GameClient
 
@@ -35,38 +32,15 @@ class QuokkaGameActivity : AppCompatActivity() {
         )
         game = GameClient()
 
-        // ---------------------- Game notifications ------------------
-
-        game.scoreQuokka.observe(this){
-            binding.scoreQuokka.text = it.toString()
-        }
-
-        game.scoreWhack.observe(this){
-            binding.scoreWhack.text = it.toString()
-        }
-
-        game.timer.observe(this){
-            binding.time.text = it.toString()
-        }
-
-        game.updateHoleNumber.observe(this){
-            game.updateHolesView(spawns, it)
-        }
-
-        game.gameOver.observe(this){
-            if(it)
-
-                game.stopGame()
-
-            // TODO end screen (dialog ?)
-        }
+        // ---------------------- Set Game values ----------------------
+        super.spawns = spawns
+        super.quokkaScore = binding.scoreQuokka
+        super.whackScore = binding.scoreWhack
+        super.time = binding.time
+        super.quitButton = binding.quitImageButton
+        super.abstractGame = game
 
         // ---------------------- Listeners ---------------------------
-
-        binding.quitImageButton.setOnClickListener {
-            finish()
-        }
-
         binding.spawn1Button.setOnTouchListener { _, event ->
             if (event.action == MotionEvent.ACTION_DOWN) {
                 // Pressed
@@ -183,7 +157,6 @@ class QuokkaGameActivity : AppCompatActivity() {
                     Toast.makeText(this@QuokkaGameActivity, "Disconnected", Toast.LENGTH_SHORT)
                         .show()
                 }
-
             }
 
         BluetoothConnectionService.instance.dataListener =
@@ -195,8 +168,6 @@ class QuokkaGameActivity : AppCompatActivity() {
                     game.handleMessage(Message.fromPayload(payload!!))
                 }
             }
-
-
     }
 
     override fun onStop() {
@@ -204,5 +175,4 @@ class QuokkaGameActivity : AppCompatActivity() {
         BluetoothConnectionService.disconnectFromAllEndpoints()
         game.stopGame()
     }
-
 }
