@@ -3,9 +3,7 @@ package com.and.whacaquokkaapplication
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.MotionEvent
-import android.widget.Toast
 import com.and.whacaquokkaapplication.databinding.ActivityQuokkaGameBinding
-import com.and.whacaquokkaapplication.bluetoothmanager.BluetoothConnectionService
 import com.and.whacaquokkaapplication.gamelogic.GameClient
 import com.and.whacaquokkaapplication.models.enums.QuokkaStatus
 
@@ -122,22 +120,5 @@ class QuokkaGameActivity : GameActivity() {
             }
             true
         }
-
-        // Detect the disconnection
-        BluetoothConnectionService.instance.endpointListener =
-            object : BluetoothConnectionService.EndpointListener {
-                override fun onEndpointDiscovered(endpoint: BluetoothConnectionService.Endpoint?) {
-                }
-
-                override fun onEndpointConnected(endpoint: BluetoothConnectionService.Endpoint?) {
-                }
-
-                override fun onEndpointDisconnected(endpoint: BluetoothConnectionService.Endpoint?) {
-                    BluetoothConnectionService.stopAll()
-                    game.stopGame()
-                    Toast.makeText(this@QuokkaGameActivity, "Disconnected", Toast.LENGTH_SHORT)
-                        .show()
-                }
-            }
     }
 }

@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import com.and.whacaquokkaapplication.bluetoothmanager.BluetoothConnectionService
 import com.and.whacaquokkaapplication.gamelogic.Game
 import com.and.whacaquokkaapplication.models.Message
@@ -55,6 +56,23 @@ abstract class GameActivity : AppCompatActivity() {
 
         // ---------------------- Bluetooth ---------------------------
         BluetoothConnectionService.removeListener()
+
+        // Detect the disconnection
+        BluetoothConnectionService.instance.endpointListener =
+            object : BluetoothConnectionService.EndpointListener {
+                override fun onEndpointDiscovered(endpoint: BluetoothConnectionService.Endpoint?) {
+                }
+
+                override fun onEndpointConnected(endpoint: BluetoothConnectionService.Endpoint?) {
+                }
+
+                override fun onEndpointDisconnected(endpoint: BluetoothConnectionService.Endpoint?) {
+                    BluetoothConnectionService.stopAll()
+                    game.stopGame()
+                    Toast.makeText(this@GameActivity, "Disconnected", Toast.LENGTH_SHORT)
+                        .show()
+                }
+            }
 
         BluetoothConnectionService.instance.dataListener =
             object : BluetoothConnectionService.DataListener {

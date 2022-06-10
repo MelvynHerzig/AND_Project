@@ -1,7 +1,6 @@
 package com.and.whacaquokkaapplication
 
 import android.os.Bundle
-import android.widget.Toast
 import com.and.whacaquokkaapplication.bluetoothmanager.BluetoothConnectionService
 import com.and.whacaquokkaapplication.databinding.ActivityWhackGameBinding
 import com.and.whacaquokkaapplication.gamelogic.GameMaster
@@ -81,24 +80,6 @@ class WhackGameActivity : GameActivity() {
         binding.spawn9.setOnClickListener {
             master.hitHole(8)
         }
-
-        // Detect the disconnection
-        BluetoothConnectionService.instance.endpointListener =
-            object : BluetoothConnectionService.EndpointListener {
-                override fun onEndpointDiscovered(endpoint: BluetoothConnectionService.Endpoint?) {
-                }
-
-                override fun onEndpointConnected(endpoint: BluetoothConnectionService.Endpoint?) {
-                }
-
-                override fun onEndpointDisconnected(endpoint: BluetoothConnectionService.Endpoint?) {
-                    BluetoothConnectionService.stopAll()
-                    game.stopGame()
-                    Toast.makeText(this@WhackGameActivity, "Disconnected", Toast.LENGTH_SHORT)
-                        .show()
-                }
-
-            }
     }
 
     override fun onStop() {
