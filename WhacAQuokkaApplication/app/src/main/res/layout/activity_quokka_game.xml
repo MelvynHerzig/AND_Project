@@ -29,19 +29,6 @@
         android:singleLine="true"
         android:text="@string/score_image"
         android:textColor="@color/white"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/score_quokka" />
-
-    <!-- Time management -->
-    <TextView
-        android:id="@+id/time"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="@drawable/time_counter"
-        android:breakStrategy="simple"
-        android:singleLine="true"
-        android:text="@string/time_image"
-        android:textColor="@color/white"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
