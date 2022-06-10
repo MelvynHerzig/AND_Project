@@ -3,10 +3,8 @@ package com.and.whacaquokkaapplication
 import android.os.Bundle
 import android.widget.Toast
 import com.and.whacaquokkaapplication.bluetoothmanager.BluetoothConnectionService
-import com.google.android.gms.nearby.connection.Payload
 import com.and.whacaquokkaapplication.databinding.ActivityWhackGameBinding
 import com.and.whacaquokkaapplication.gamelogic.GameMaster
-import com.and.whacaquokkaapplication.models.Message
 
 /**
  * Activity used to handle the Whack Quokka Part of game / player.
@@ -83,8 +81,6 @@ class WhackGameActivity : GameActivity() {
         binding.spawn9.setOnClickListener {
             master.hitHole(8)
         }
-        
-        BluetoothConnectionService.removeListener();
 
         // Detect the disconnection
         BluetoothConnectionService.instance.endpointListener =
@@ -102,16 +98,6 @@ class WhackGameActivity : GameActivity() {
                         .show()
                 }
 
-            }
-
-        BluetoothConnectionService.instance.dataListener =
-            object : BluetoothConnectionService.DataListener {
-                override fun onReceive(
-                    endpoint: BluetoothConnectionService.Endpoint?,
-                    payload: Payload?
-                ) {
-                    game.handleMessage(Message.fromPayload(payload!!))
-                }
             }
     }
 

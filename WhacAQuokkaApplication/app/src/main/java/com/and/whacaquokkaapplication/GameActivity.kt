@@ -7,6 +7,8 @@ import android.widget.ImageView
 import android.widget.TextView
 import com.and.whacaquokkaapplication.bluetoothmanager.BluetoothConnectionService
 import com.and.whacaquokkaapplication.gamelogic.Game
+import com.and.whacaquokkaapplication.models.Message
+import com.google.android.gms.nearby.connection.Payload
 
 abstract class GameActivity : AppCompatActivity() {
 
@@ -50,6 +52,19 @@ abstract class GameActivity : AppCompatActivity() {
         quitButton.setOnClickListener {
             finish()
         }
+
+        // ---------------------- Bluetooth ---------------------------
+        BluetoothConnectionService.removeListener()
+
+        BluetoothConnectionService.instance.dataListener =
+            object : BluetoothConnectionService.DataListener {
+                override fun onReceive(
+                    endpoint: BluetoothConnectionService.Endpoint?,
+                    payload: Payload?
+                ) {
+                    game.handleMessage(Message.fromPayload(payload!!))
+                }
+            }
     }
 
     private fun showEndPopUp(won: Boolean) {

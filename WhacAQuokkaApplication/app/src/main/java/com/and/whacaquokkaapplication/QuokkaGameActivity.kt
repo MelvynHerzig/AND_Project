@@ -7,9 +7,7 @@ import android.widget.Toast
 import com.and.whacaquokkaapplication.databinding.ActivityQuokkaGameBinding
 import com.and.whacaquokkaapplication.bluetoothmanager.BluetoothConnectionService
 import com.and.whacaquokkaapplication.gamelogic.GameClient
-import com.and.whacaquokkaapplication.models.Message
 import com.and.whacaquokkaapplication.models.enums.QuokkaStatus
-import com.google.android.gms.nearby.connection.Payload
 
 /**
  * Activity used to handle the Spawning Quokka Part of game / player.
@@ -125,8 +123,6 @@ class QuokkaGameActivity : GameActivity() {
             true
         }
 
-        BluetoothConnectionService.removeListener();
-
         // Detect the disconnection
         BluetoothConnectionService.instance.endpointListener =
             object : BluetoothConnectionService.EndpointListener {
@@ -141,16 +137,6 @@ class QuokkaGameActivity : GameActivity() {
                     game.stopGame()
                     Toast.makeText(this@QuokkaGameActivity, "Disconnected", Toast.LENGTH_SHORT)
                         .show()
-                }
-            }
-
-        BluetoothConnectionService.instance.dataListener =
-            object : BluetoothConnectionService.DataListener {
-                override fun onReceive(
-                    endpoint: BluetoothConnectionService.Endpoint?,
-                    payload: Payload?
-                ) {
-                    game.handleMessage(Message.fromPayload(payload!!))
                 }
             }
     }
