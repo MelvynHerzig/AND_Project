@@ -2,24 +2,26 @@ package com.and.whacaquokkaapplication
 
 import android.annotation.SuppressLint
 import android.os.Bundle
-import android.util.Log
 import android.view.MotionEvent
 import android.widget.Toast
 import com.and.whacaquokkaapplication.databinding.ActivityQuokkaGameBinding
 import com.and.whacaquokkaapplication.bluetoothmanager.BluetoothConnectionService
 import com.and.whacaquokkaapplication.gamelogic.GameClient
 import com.and.whacaquokkaapplication.models.Message
-import com.and.whacaquokkaapplication.models.QuokkaStatus
+import com.and.whacaquokkaapplication.models.enums.QuokkaStatus
 import com.google.android.gms.nearby.connection.Payload
 
-
+/**
+ * Activity used to handle the Spawning Quokka Part of game / player.
+ * @author Berney Alec
+ * @author Forestier Quentin
+ * @author Herzig Melvyn
+ */
 class QuokkaGameActivity : GameActivity() {
 
     private lateinit var binding: ActivityQuokkaGameBinding
 
-
     @SuppressLint("ClickableViewAccessibility")
-
     override fun onCreate(savedInstanceState: Bundle?) {
         binding = ActivityQuokkaGameBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -40,7 +42,6 @@ class QuokkaGameActivity : GameActivity() {
         super.game = game
 
         super.onCreate(savedInstanceState)
-
 
         // ---------------------- Listeners ---------------------------
         binding.spawn1Button.setOnTouchListener { _, event ->
@@ -126,7 +127,7 @@ class QuokkaGameActivity : GameActivity() {
 
         BluetoothConnectionService.removeListener();
 
-        // Detecte la déconnexion
+        // Detect the disconnection
         BluetoothConnectionService.instance.endpointListener =
             object : BluetoothConnectionService.EndpointListener {
                 override fun onEndpointDiscovered(endpoint: BluetoothConnectionService.Endpoint?) {
@@ -153,6 +154,4 @@ class QuokkaGameActivity : GameActivity() {
                 }
             }
     }
-
-
 }

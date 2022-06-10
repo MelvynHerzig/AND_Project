@@ -1,4 +1,4 @@
-package com.and.whacaquokkaapplication.models
+package com.and.whacaquokkaapplication.models.enums
 
 import kotlinx.serialization.Serializable
 

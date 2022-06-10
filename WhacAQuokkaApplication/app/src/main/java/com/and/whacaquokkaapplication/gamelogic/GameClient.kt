@@ -2,6 +2,8 @@ package com.and.whacaquokkaapplication.gamelogic
 
 import com.and.whacaquokkaapplication.bluetoothmanager.BluetoothConnectionService
 import com.and.whacaquokkaapplication.models.*
+import com.and.whacaquokkaapplication.models.enums.GameStatus
+import com.and.whacaquokkaapplication.models.enums.QuokkaStatus
 
 /**
  * Game logic class made for client (spawning quokka).

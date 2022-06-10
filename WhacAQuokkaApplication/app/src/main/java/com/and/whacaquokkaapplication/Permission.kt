@@ -57,7 +57,5 @@ class Permission {
         fun hasPermissions(context: Context): Boolean = PERMISSIONS.all {
             ActivityCompat.checkSelfPermission(context, it) == PackageManager.PERMISSION_GRANTED
         }
-
-
     }
 }

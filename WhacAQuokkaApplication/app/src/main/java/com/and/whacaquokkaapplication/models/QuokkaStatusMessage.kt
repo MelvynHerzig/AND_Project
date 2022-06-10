@@ -1,5 +1,7 @@
 package com.and.whacaquokkaapplication.models
 
+import com.and.whacaquokkaapplication.models.enums.MessageType
+import com.and.whacaquokkaapplication.models.enums.QuokkaStatus
 import com.google.android.gms.nearby.connection.Payload
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString

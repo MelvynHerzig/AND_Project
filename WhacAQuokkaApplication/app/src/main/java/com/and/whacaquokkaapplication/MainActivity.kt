@@ -11,22 +11,22 @@ import androidx.appcompat.app.AppCompatActivity
 import com.and.whacaquokkaapplication.bluetoothmanager.BluetoothConnectionService
 import com.google.android.gms.nearby.Nearby
 
+/**
+ * Main Activity used to connect the two players using Bluetooth Nearby Connections.
+ * @author Berney Alec
+ * @author Forestier Quentin
+ * @author Herzig Melvyn
+ */
 class MainActivity : AppCompatActivity() {
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
-
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
 
         BluetoothConnectionService.instance.mConnectionsClient =
             Nearby.getConnectionsClient(this.applicationContext)
 
-
-
-
-
+        // Start Adverting to wait an other device to connect
         findViewById<TextView>(R.id.advert_button).setOnClickListener {
             if (!Permission.hasPermissions(this)) {
                 Permission.requestPermissionsDiscovery(this)
@@ -35,6 +35,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        // Start Discovery to find an other device to connect
         findViewById<TextView>(R.id.discover_button).setOnClickListener {
             if (!Permission.hasPermissions(this)) {
                 Permission.requestPermissionsAdvertising(this)
@@ -42,13 +43,12 @@ class MainActivity : AppCompatActivity() {
                 BluetoothConnectionService.startDiscovering()
             }
         }
-
-
     }
 
     override fun onResume() {
         super.onResume()
 
+        // Manage bluetooth connections
         BluetoothConnectionService.instance.advertisingListener =
             object : BluetoothConnectionService.AdvertisingListener {
                 override fun onAdvertisingStarted() {

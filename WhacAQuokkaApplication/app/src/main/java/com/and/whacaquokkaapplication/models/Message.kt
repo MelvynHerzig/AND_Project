@@ -1,7 +1,6 @@
 package com.and.whacaquokkaapplication.models
 
-import android.util.Log
-import com.and.whacaquokkaapplication.WhackGameActivity
+import com.and.whacaquokkaapplication.models.enums.MessageType
 import com.google.android.gms.nearby.connection.Payload
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
@@ -32,9 +31,6 @@ open class Message(val type: MessageType) {
                 MessageType.QuokkaStatus -> json.decodeFromString<QuokkaStatusMessage>(str)
                 MessageType.ScoreStatus -> json.decodeFromString<ScoreStatusMessage>(str)
             }
-
-            Log.println(Log.INFO, "dfkjlih gdsfhjz", m.toString())
-
             return m
         }
     }

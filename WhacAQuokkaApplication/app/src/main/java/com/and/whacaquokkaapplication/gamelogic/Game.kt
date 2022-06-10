@@ -6,6 +6,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.and.whacaquokkaapplication.R
 import com.and.whacaquokkaapplication.models.*
+import com.and.whacaquokkaapplication.models.enums.QuokkaStatus
 
 /**
  * Common game logic class shared by game client and master

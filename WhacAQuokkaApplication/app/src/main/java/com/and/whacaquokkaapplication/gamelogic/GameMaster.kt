@@ -1,9 +1,10 @@
 package com.and.whacaquokkaapplication.gamelogic
 
 import android.os.CountDownTimer
-import android.util.Log
 import com.and.whacaquokkaapplication.bluetoothmanager.BluetoothConnectionService
 import com.and.whacaquokkaapplication.models.*
+import com.and.whacaquokkaapplication.models.enums.GameStatus
+import com.and.whacaquokkaapplication.models.enums.QuokkaStatus
 
 /**
  * Game logic class made for masker (whacking quokka).
@@ -17,7 +18,6 @@ class GameMaster : Game() {
      * Timer triggered every 400ms when quokka is out to increase client score.
      */
     private var scoreTimer: CountDownTimer? = null
-
 
     /**
      * Show or hide quokka at given position
@@ -62,7 +62,6 @@ class GameMaster : Game() {
                     }
                 }
             }
-
             scoreTimer?.start()
         }
     }
@@ -87,7 +86,6 @@ class GameMaster : Game() {
             setScore(updatedScoreQuokka, updatedScoreWhack)
 
             // Notify client.
-
             BluetoothConnectionService.send(
                 QuokkaStatusMessage(
                     pos,
