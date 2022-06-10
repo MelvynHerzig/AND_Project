@@ -32,13 +32,24 @@ class WhackGameActivity : GameActivity() {
         )
         quokkaScore = binding.scoreQuokka
         whackScore = binding.scoreWhack
-        time = binding.time
         quitButton = binding.quitImageButton
 
 
+        game.scoreQuokka.observe(this) {
+            if(it >= 10){
+                game.stop()
+            }
+        }
+
+        game.scoreWhack.observe(this) {
+            if(it >= 10){
+                game.stop()
+            }
+        }
+
         super.onCreate(savedInstanceState)
 
-        game.startGame()
+        game.start()
 
         // ---------------------- Listeners ---------------------------
         binding.quitImageButton.setOnClickListener {
@@ -83,8 +94,8 @@ class WhackGameActivity : GameActivity() {
     }
 
     override fun onStop() {
-        super.onStop()
+        game.stop()
         BluetoothConnectionService.disconnectFromAllEndpoints()
-        game.stopGame()
+        super.onStop()
     }
 }

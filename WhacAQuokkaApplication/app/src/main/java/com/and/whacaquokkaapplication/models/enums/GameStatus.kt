@@ -11,5 +11,6 @@ import kotlinx.serialization.Serializable
 @Serializable
 enum class GameStatus {
     START,
-    STOP
+    OVER,
+    WAITING
 }

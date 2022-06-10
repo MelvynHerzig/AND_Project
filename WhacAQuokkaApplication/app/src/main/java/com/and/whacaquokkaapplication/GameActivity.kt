@@ -9,6 +9,7 @@ import android.widget.Toast
 import com.and.whacaquokkaapplication.bluetoothmanager.BluetoothConnectionService
 import com.and.whacaquokkaapplication.gamelogic.Game
 import com.and.whacaquokkaapplication.models.Message
+import com.and.whacaquokkaapplication.models.enums.GameStatus
 import com.google.android.gms.nearby.connection.Payload
 
 abstract class GameActivity : AppCompatActivity() {
@@ -16,7 +17,6 @@ abstract class GameActivity : AppCompatActivity() {
     protected lateinit var spawns: Array<ImageView>
     protected lateinit var quokkaScore: TextView
     protected lateinit var whackScore: TextView
-    protected lateinit var time: TextView
     protected lateinit var quitButton: TextView
     protected lateinit var game: Game
 
@@ -34,17 +34,13 @@ abstract class GameActivity : AppCompatActivity() {
             whackScore.text = it.toString()
         }
 
-        game.timer.observe(this) {
-            time.text = it.toString()
-        }
 
         game.updateHoleNumber.observe(this) {
             game.updateHolesView(spawns, it)
         }
 
-        game.gameOver.observe(this){
-            if(it) {
-                game.stopGame()
+        game.gameStatus.observe(this) {
+            if (it == GameStatus.OVER) {
                 showEndPopUp(game.didIWin())
             }
         }
@@ -67,8 +63,8 @@ abstract class GameActivity : AppCompatActivity() {
                 }
 
                 override fun onEndpointDisconnected(endpoint: BluetoothConnectionService.Endpoint?) {
+                    game.stop()
                     BluetoothConnectionService.stopAll()
-                    game.stopGame()
                     Toast.makeText(this@GameActivity, "Disconnected", Toast.LENGTH_SHORT)
                         .show()
                 }
@@ -100,8 +96,8 @@ abstract class GameActivity : AppCompatActivity() {
     }
 
     override fun onStop() {
-        super.onStop()
+        game.stop()
         BluetoothConnectionService.disconnectFromAllEndpoints()
-        game.stopGame()
+        super.onStop()
     }
 }

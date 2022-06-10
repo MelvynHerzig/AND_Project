@@ -1,11 +1,11 @@
 package com.and.whacaquokkaapplication.gamelogic
 
-import android.os.CountDownTimer
 import android.widget.ImageView
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.and.whacaquokkaapplication.R
 import com.and.whacaquokkaapplication.models.*
+import com.and.whacaquokkaapplication.models.enums.GameStatus
 import com.and.whacaquokkaapplication.models.enums.QuokkaStatus
 
 /**
@@ -27,11 +27,6 @@ abstract class Game {
     val scoreWhack: LiveData<Int> get() = _scoreWhack
 
     /**
-     * Live data to spectate timer.
-     */
-    val timer: LiveData<Int> get() = _timer
-
-    /**
      * Live data to spectate hole to update.
      */
     val updateHoleNumber: LiveData<Int> get() = _updateHoleNumber
@@ -39,7 +34,7 @@ abstract class Game {
     /**
      * Live data to spectate when to display end screen
      */
-    val gameOver: LiveData<Boolean> get() = _gameOver
+    val gameStatus: LiveData<GameStatus> get() = _gameStatus
 
     /**
      * Mutable live data of quokka (client) score.
@@ -52,11 +47,6 @@ abstract class Game {
     protected val _scoreWhack = MutableLiveData(0)
 
     /**
-     * Mutable live data of timer
-     */
-    protected val _timer = MutableLiveData(0)
-
-    /**
      * Mutable live data to tell activity to update display.
      */
     protected val _updateHoleNumber = MutableLiveData(-1)
@@ -64,12 +54,7 @@ abstract class Game {
     /**
      * Mutable live data to tell activity that game is over and display end screen.
      */
-    protected val _gameOver = MutableLiveData(false)
-
-    /**
-     * Timer to mesure 60s game that trigger each second.
-     */
-    protected var clockTimer: CountDownTimer? = null
+    protected val _gameStatus = MutableLiveData(GameStatus.WAITING)
 
     /**
      * Array of boolean that represent holes state. True = quokka up, False = empty.
@@ -77,14 +62,14 @@ abstract class Game {
     protected val holesState = Array(9) { _ -> true }
 
     /**
-     * Current hole with quokka up, 0 means none.
+     * Current hole with quokka up, -1 means none.
      */
-    protected var currentHoleOut = 0
+    protected var currentHoleOut = -1
 
     /**
      * Update live data of both scores.
      */
-    protected fun setScore(newScoreQuokka: Int, newScoreWhack: Int) {
+    protected open fun setScore(newScoreQuokka: Int, newScoreWhack: Int) {
         _scoreQuokka.postValue(newScoreQuokka)
         _scoreWhack.postValue(newScoreWhack)
     }
@@ -94,6 +79,7 @@ abstract class Game {
      * and update the live data to notify UI to update.
      */
     protected fun setHoleState(pos: Int, status : QuokkaStatus) {
+
         holesState[pos] = status == QuokkaStatus.HIDE
         _updateHoleNumber.postValue(pos)
     }
@@ -101,8 +87,8 @@ abstract class Game {
     /**
      * Check if game is over.
      */
-    protected fun isGameOver(): Boolean {
-        return _gameOver.value!!
+    protected fun getGameStatus(): GameStatus {
+        return _gameStatus.value!!
     }
 
     /**
@@ -110,7 +96,7 @@ abstract class Game {
      */
     fun updateHolesView(holes: Array<ImageView>, pos: Int) {
         if(pos == -1) return
-        if (!holesState[pos]) {
+        if (!holesState[pos] && currentHoleOut == -1) {
             currentHoleOut = pos
             holes[pos].setImageResource(R.drawable.hole_with_quokka)
         } else {
@@ -120,28 +106,17 @@ abstract class Game {
     }
 
     /**
-     * Start the game, i.e: start the 60s timer.
+     * Set the game status to start
      */
-    open fun startGame() {
-
-
-        _timer.postValue(60)
-        clockTimer = object : CountDownTimer(60000, 1000) {
-            override fun onFinish() {
-                _gameOver.postValue(true)
-            }
-
-            override fun onTick(millisUntilFinished: Long) {
-                _timer.postValue(_timer.value!! - 1)
-            }
-        }.start()
+    open fun start(){
+        _gameStatus.postValue(GameStatus.START)
     }
 
     /**
-     * On game stop, cancel clock timer
+     * Set the game status to over
      */
-    open fun stopGame() {
-        clockTimer!!.cancel()
+    open fun stop(){
+        _gameStatus.postValue(GameStatus.OVER)
     }
 
     /**
@@ -159,4 +134,7 @@ abstract class Game {
      * Watch scores and indicate if the player is the winner.
      */
     abstract fun didIWin(): Boolean
+
+
+
 }

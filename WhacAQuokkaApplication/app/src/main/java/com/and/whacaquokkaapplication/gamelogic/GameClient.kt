@@ -18,7 +18,7 @@ class GameClient : Game() {
      * Send the command to the server.
      */
     override fun setQuokkaVisiblity(pos: Int, status: QuokkaStatus) {
-        if (isGameOver()) return
+        if (getGameStatus() != GameStatus.START) return
         if (pos == -1 && status == QuokkaStatus.SHOW) return
         if (status == QuokkaStatus.HIDE && pos != currentHoleOut) return
         setHoleState(pos, status)
@@ -41,10 +41,13 @@ class GameClient : Game() {
                 setQuokkaVisiblity(message.pos, message.status)
             }
             is GameStatusMessage -> {
-                if (message.status == GameStatus.STOP) {
-                    stopGame()
-                } else if (message.status == GameStatus.START) {
-                    startGame()
+                when (message.status) {
+                    GameStatus.START -> {
+                        start()
+                    }
+                    GameStatus.OVER -> {
+                        stop()
+                    }
                 }
             }
             is ScoreStatusMessage -> {
@@ -54,9 +57,17 @@ class GameClient : Game() {
     }
 
     /**
+     * Get if a quokka is already out
+     */
+    fun isQuokkaAlreadyOut(): Boolean {
+        return currentHoleOut != -1
+    }
+
+    /**
      * Watch scores and indicate if the player is the winner.
      */
     override fun didIWin(): Boolean {
         return scoreQuokka.value!! > scoreWhack.value!!
     }
+
 }

@@ -31,7 +31,12 @@ class MainActivity : AppCompatActivity() {
             if (!Permission.hasPermissions(this)) {
                 Permission.requestPermissionsDiscovery(this)
             } else {
-                BluetoothConnectionService.startAdvertising()
+                if(!BluetoothConnectionService.instance.isAdvertising) {
+                    BluetoothConnectionService.startAdvertising()
+                    BluetoothConnectionService.stopDiscovering()
+                }
+                else
+                    Toast.makeText(this, "Already advertising", Toast.LENGTH_SHORT).show()
             }
         }
 
@@ -40,7 +45,12 @@ class MainActivity : AppCompatActivity() {
             if (!Permission.hasPermissions(this)) {
                 Permission.requestPermissionsAdvertising(this)
             } else {
-                BluetoothConnectionService.startDiscovering()
+                if(!BluetoothConnectionService.instance.isDiscovering) {
+                    BluetoothConnectionService.startDiscovering()
+                    BluetoothConnectionService.stopAdvertising()
+                }
+                else
+                    Toast.makeText(this, "Already discovering", Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -120,11 +130,11 @@ class MainActivity : AppCompatActivity() {
                 }
 
                 override fun onEndpointConnected(endpoint: BluetoothConnectionService.Endpoint?) {
-                    if(BluetoothConnectionService.instance.isAdvertising){
+                    if(BluetoothConnectionService.instance.isAdvertising && !BluetoothConnectionService.instance.isDiscovering) {
                         BluetoothConnectionService.stopAdvertising()
                         val intent = Intent(this@MainActivity, WhackGameActivity::class.java)
                         startActivity(intent)
-                    }else{
+                    }else if(!BluetoothConnectionService.instance.isAdvertising && BluetoothConnectionService.instance.isDiscovering){
                         BluetoothConnectionService.stopDiscovering()
                         val intent = Intent(this@MainActivity, QuokkaGameActivity::class.java)
                         startActivity(intent)
