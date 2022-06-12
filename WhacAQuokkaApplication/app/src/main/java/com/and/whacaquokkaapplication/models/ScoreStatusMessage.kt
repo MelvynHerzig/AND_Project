@@ -17,6 +17,9 @@ class ScoreStatusMessage(
     val quokkaScore: Int,
     val whackScore: Int
 ) : Message(MessageType.ScoreStatus) {
+    /**
+     * Method that serialize the message into a payload
+     */
     override fun toPayload(): Payload {
         return Payload.fromBytes(Json.encodeToString(this).toByteArray())
     }

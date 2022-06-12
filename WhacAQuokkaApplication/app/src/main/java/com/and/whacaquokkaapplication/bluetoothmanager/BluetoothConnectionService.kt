@@ -5,6 +5,12 @@ import com.google.android.gms.nearby.connection.*
 import android.os.Build
 
 /**
+ * A service that handles the bluetooth connection to a remote device.
+ *
+ * @author Berney Alec
+ * @author Forestier Quentin
+ * @author Herzig Melvyn
+ *
  * Inspiré par :
  * - https://medium.com/@TusharKhattar/google-nearby-connection-persisting-connection-across-different-activities-1ffbc428df5
  * - https://github.com/googlearchive/android-nearby/blob/master/connections/walkietalkie/app/src/main/java/com/google/location/nearby/apps/walkietalkie/ConnectionsActivity.java
@@ -394,6 +400,9 @@ class BluetoothConnectionService private constructor() {
             instance.send(payload, instance.mEstablishedConnections.keys)
         }
 
+        /**
+         * Stops all connections and disconnects from all endpoints.
+         */
         fun stopAll(){
             stopAllEndpoints()
             stopAdvertising()

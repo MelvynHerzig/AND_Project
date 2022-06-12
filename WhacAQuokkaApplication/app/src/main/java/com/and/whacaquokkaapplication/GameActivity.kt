@@ -12,6 +12,13 @@ import com.and.whacaquokkaapplication.models.Message
 import com.and.whacaquokkaapplication.models.enums.GameStatus
 import com.google.android.gms.nearby.connection.Payload
 
+/**
+ * This abstract activity is used to handle common the game logic.
+ *
+ * @author Berney Alec
+ * @author Forestier Quentin
+ * @author Herzig Melvyn
+ */
 abstract class GameActivity : AppCompatActivity() {
 
     protected lateinit var spawns: Array<ImageView>
@@ -81,6 +88,9 @@ abstract class GameActivity : AppCompatActivity() {
             }
     }
 
+    /**
+     * Show the end pop up.
+     */
     private fun showEndPopUp(won: Boolean) {
         val endMessage: String =
             if (won) getString(R.string.end_game_message_won)

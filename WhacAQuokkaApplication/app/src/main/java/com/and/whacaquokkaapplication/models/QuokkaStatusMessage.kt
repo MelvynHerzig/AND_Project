@@ -18,6 +18,10 @@ class QuokkaStatusMessage (
     val pos: Int,
     val status: QuokkaStatus
 ) : Message(MessageType.QuokkaStatus) {
+
+    /**
+     * Convert the message to a payload
+     */
     override fun toPayload(): Payload {
         return Payload.fromBytes(Json.encodeToString(this).toByteArray())
     }

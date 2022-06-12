@@ -15,6 +15,9 @@ import kotlinx.serialization.json.Json
  */
 @Serializable
 class GameStatusMessage(val status: GameStatus) : Message(MessageType.GameStatus) {
+    /**
+     * Method that serialize the message into a payload
+     */
     override fun toPayload(): Payload {
         return Payload.fromBytes(Json.encodeToString(this).toByteArray())
     }

@@ -15,6 +15,10 @@ import kotlinx.serialization.json.Json
  */
 @Serializable
 open class Message(val type: MessageType) {
+
+    /**
+     * Method that serialize the message into a payload
+     */
     open fun toPayload(): Payload {
         return Payload.fromBytes(Json.encodeToString(this).toByteArray())
     }
@@ -22,6 +26,9 @@ open class Message(val type: MessageType) {
     companion object {
         private val json = Json { ignoreUnknownKeys = true }
 
+        /**
+         * Method that convert a payload to a message
+         */
         fun fromPayload(payload: Payload): Message {
             val str = payload.asBytes()?.let { String(it) }
             val obj = str?.let { json.decodeFromString<Message>(it) }
